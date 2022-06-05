@@ -3,7 +3,8 @@ Python 版本snowflake 雪花算法
 Python version：3.9
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
-import logging
+
+from tools.log import logutil
 import time
 
 # 64位ID的划分
@@ -23,7 +24,8 @@ TIMESTAMP_LEFT_SHIFT = SEQUENCE_BITS + WORKER_ID_BITS + DATACENTER_ID_BITS
 SEQUENCE_MASK = -1 ^ (-1 << SEQUENCE_BITS)
 # Twitter元年时间戳
 TWEPOCH = 1288834974657
-logger = logging.getLogger('flask.app')
+
+logger = logutil.mylog(logger='[snowflake]').get_logger()
 
 
 class IdWorker(object):
@@ -67,7 +69,7 @@ class IdWorker(object):
 
         # 时钟回拨
         if timestamp < self.last_timestamp:
-            logging.error('clock is moving backwards. Rejecting requests until {}'.format(self.last_timestamp))
+            logger.error('clock is moving backwards. Rejecting requests until {}'.format(self.last_timestamp))
             raise
 
         if timestamp == self.last_timestamp:
@@ -79,8 +81,7 @@ class IdWorker(object):
 
         self.last_timestamp = timestamp
 
-        new_id = ((timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT) | (self.datacenter_id << DATACENTER_ID_SHIFT) | (
-                self.worker_id << WOKER_ID_SHIFT) | self.sequence
+        new_id = ((timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT) | (self.datacenter_id << DATACENTER_ID_SHIFT) | (self.worker_id << WOKER_ID_SHIFT) | self.sequence
         return new_id
 
     def _til_next_millis(self, last_timestamp):
@@ -93,7 +94,12 @@ class IdWorker(object):
         return timestamp
 
 
-if __name__ == '__main__':
+def get_id():
     worker = IdWorker(1, 2, 0)
-    for x in range(1, 1000000):
+    for x in range(1, 10):
         print(worker.get_id())
+        logger.info(worker.get_id())
+
+
+if __name__ == '__main__':
+    get_id()
