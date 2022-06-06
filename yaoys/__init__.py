@@ -1,4 +1,3 @@
-
-from tools.log.logutil import mylog
-import tools.database.mysql as mysql
-import tools.uniqueid.snowflake as snowflakeid
+from yaoysTools.log.logutil import mylog
+import yaoysTools.database.mysql as mysql
+import yaoysTools.uniqueid.snowflake as snowflakeid
