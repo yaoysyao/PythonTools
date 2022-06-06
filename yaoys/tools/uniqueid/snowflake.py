@@ -4,7 +4,7 @@ Python version：3.9
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
 
-from tools.log import logutil
+from yaoys.tools.log import logutil
 import time
 
 # 64位ID的划分

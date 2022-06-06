@@ -10,3 +10,5 @@
 *.iml
 /.idea/
 /log
+/.*gz
+*.log
