@@ -3,6 +3,7 @@ import logging
 import os.path
 import sys
 import time
+from marshmallow import Schema, fields, ValidationError
 
 
 class mylog(object):
@@ -42,9 +43,6 @@ class mylog(object):
         # 设置日志路径
         self.log_path = log_path
 
-        # 创建日志名称。
-        rq = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-
         # 如果不存在已经设置日志路径
         if self.log_path is None:
             # os.getcwd()获取当前文件的路径，
@@ -57,7 +55,12 @@ class mylog(object):
         else:
             # 否则，设置了路径就使用用户设置的路径
             path_dir = self.log_path
+            # 最后为目录，不存在则创建
+            if not os.path.exists(path_dir):
+                os.makedirs(path_dir)
 
+        # 创建日志名称。
+        rq = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         # 拼接日志文件路径名称
         log_name = os.path.join(path_dir, rq + '-' + 'ALL' + '.log')
         info_log_name = os.path.join(path_dir, rq + '-' + str(logging.getLevelName(logging.INFO)) + '.log')
