@@ -3,8 +3,9 @@ Python 版本snowflake 雪花算法
 Python version：3.9
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
+import logging
 
-from yaoys.tools.log import logutil
+from yaoysTools.log import logutil
 import time
 
 # 64位ID的划分
@@ -25,7 +26,7 @@ SEQUENCE_MASK = -1 ^ (-1 << SEQUENCE_BITS)
 # Twitter元年时间戳
 TWEPOCH = 1288834974657
 
-logger = logutil.mylog(logger='[snowflake]').get_logger()
+logger = logutil.getLogger(logger='[snowflake]', log_level=logging.INFO)
 
 
 class IdWorker(object):
@@ -97,8 +98,8 @@ class IdWorker(object):
 def get_id():
     worker = IdWorker(1, 2, 0)
     for x in range(1, 10):
-        print(worker.get_id())
-        logger.info(worker.get_id())
+        # print(worker.get_id())
+        logutil.log_info(worker.get_id())
 
 
 if __name__ == '__main__':

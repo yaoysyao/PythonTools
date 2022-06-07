@@ -1,14 +1,12 @@
 # _*_ coding: utf-8 _*_
 import logging
 import os.path
-import sys
 import time
-from marshmallow import Schema, fields, ValidationError
 
 
 class mylog(object):
 
-    def __init__(self, logger='log', log_path=None, log_level=None, file_log_level=None, stream_log_level=None):
+    def __init__(self, logger='my_log', log_path=None, log_level=None, file_log_level=None, stream_log_level=None):
         """
         指定保存日志的文件路径，日志级别，以及调用文件
             将日志存入到指定的文件中
@@ -118,12 +116,35 @@ class mylog(object):
         return self.logger
 
 
+my_log = mylog(logger='my_log').get_logger()
+
+
+def getLogger(logger='my_log', log_path=None, log_level=None, file_log_level=None, stream_log_level=None):
+    global my_log
+    my_log = mylog(logger, log_path, log_level, file_log_level, stream_log_level).get_logger()
+    return my_log
+
+
+def log_info(message, my_logger=None):
+    if my_logger is None:
+        my_logger = my_log
+    my_logger.info(message)
+
+
+def log_error(message, my_logger=None):
+    if my_logger is None:
+        my_logger = my_log
+    my_logger.error(message)
+
+
 if __name__ == '__main__':
     a = [1, 2, 3, 4, 5, 6]
     info_log = mylog(logger='[Demo]').get_logger()
     info_log.info('测试日志')
     info_log.error('error 测试日志')
     info_log.debug('debug 测试日志')
+
+    log_info('ceshisssss', my_logger=info_log)
 
     # error_log = mylog(logger='error').get_logger()
 
