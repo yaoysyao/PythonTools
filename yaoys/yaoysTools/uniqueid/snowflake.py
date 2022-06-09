@@ -3,10 +3,10 @@ Python 版本snowflake 雪花算法
 Python version：3.9
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
-import logging
+
+import time
 
 from yaoysTools.log import logutil
-import time
 
 # 64位ID的划分
 WORKER_ID_BITS = 5
@@ -26,10 +26,10 @@ SEQUENCE_MASK = -1 ^ (-1 << SEQUENCE_BITS)
 # Twitter元年时间戳
 TWEPOCH = 1288834974657
 
-logger = logutil.getLogger(logger='[snowflake]', log_level=logging.INFO)
+logger = logutil.getLogger(log_name='[snowflake]', log_level=logutil.MY_LOG_INFO)
 
 
-class IdWorker(object):
+class snowFlakeId(object):
     """
     用于生成IDs
     """
@@ -96,10 +96,10 @@ class IdWorker(object):
 
 
 def get_id():
-    worker = IdWorker(1, 2, 0)
+    worker = snowFlakeId(1, 2, 0)
     for x in range(1, 10):
         # print(worker.get_id())
-        logutil.log_info(worker.get_id())
+        logutil.log_info(worker.get_id(), my_logger=logger)
 
 
 if __name__ == '__main__':
