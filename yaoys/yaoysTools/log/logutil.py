@@ -68,6 +68,9 @@ class mylog(object):
                        '-fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
         self.__formatter = logging.Formatter(__format_str)
 
+        # 创建日志日期
+        self.__log_day = str(time.strftime('%Y-%m-%d', time.localtime(time.time())))
+
     def __set_stream_handler(self):
         # 再创建一个handler，用于输出到控制台
         self.__stream_handler = logging.StreamHandler()
@@ -81,8 +84,8 @@ class mylog(object):
     def __set_log_file_name(self):
         # 如果不存在已经设置日志路径
         if self.__log_path is None:
-            # os.getcwd()获取当前文件的路径，
-            path_dir = os.path.dirname(__file__) + '/log'
+            # os.getcwd()获取当前文件的路径，此时日志保存在当前工具类下log目录下，不建议不指定日志文件目录
+            path_dir = os.path.dirname(__file__) + '/log' + '/' + self.__log_day
             # 如果该项目下没有log目录，创建log目录
             if not os.path.exists(path_dir):
                 os.makedirs(path_dir)
@@ -90,19 +93,19 @@ class mylog(object):
             log_path = os.path.abspath(os.path.dirname(path_dir)) + '/log'
         else:
             # 否则，设置了路径就使用用户设置的路径
-            path_dir = self.__log_path
+            path_dir = self.__log_path + '/' + self.__log_day
             # 最后为目录，不存在则创建
             if not os.path.exists(path_dir):
                 os.makedirs(path_dir)
 
         # 创建日志名称。
-        rq = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        # rq = time.strftime('%Y-%m-%d', time.localtime(time.time()))
         # 拼接日志文件路径名称
-        self.__all_log_name = os.path.join(path_dir, rq + '-' + 'ALL' + '.log')
-        self.__info_log_name = os.path.join(path_dir, rq + '-' + str(logging.getLevelName(MY_LOG_INFO)) + '.log')
-        self.__error_log_name = os.path.join(path_dir, rq + '-' + str(logging.getLevelName(MY_LOG_ERROR)) + '.log')
-        self.__debug_log_name = os.path.join(path_dir, rq + '-' + str(logging.getLevelName(MY_LOG_DEBUG)) + '.log')
-        self.__warn_log_name = os.path.join(path_dir, rq + '-' + str(logging.getLevelName(MY_LOG_WARN)) + '.log')
+        self.__all_log_name = os.path.join(path_dir, self.__log_day + '-' + 'ALL' + '.log')
+        self.__info_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_INFO)) + '.log')
+        self.__error_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_ERROR)) + '.log')
+        self.__debug_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_DEBUG)) + '.log')
+        self.__warn_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_WARN)) + '.log')
 
     def __set_file_handler(self):
         # CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
