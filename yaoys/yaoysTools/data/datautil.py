@@ -1,7 +1,8 @@
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 
-# 划分测试数据集与训练数据集
+# 自定义划分测试数据集与训练数据集
 def split_train_test(data, test_ratio=0.2):
     """
     :param
@@ -18,3 +19,8 @@ def split_train_test(data, test_ratio=0.2):
     train_indices = shuffled_indices[test_set_size:]
     # iloc选择参数序列中所对应的行
     return data.iloc[train_indices], data.iloc[test_indices]
+
+
+# 使用sklearn库函数
+def split_train_test_sklearn(data, test_ration=0.2, train_ration=0.8, random_state=42):
+    return train_test_split(data, test_size=test_ration, train_size=train_ration, random_state=random_state)
