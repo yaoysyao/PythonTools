@@ -12,3 +12,7 @@
 /log
 /.*gz
 *.log
+/build/
+
+/yaoys/build/
+/yaoys/yaoys_python_tool.egg-info/
