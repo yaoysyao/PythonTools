@@ -1,0 +1,284 @@
+# _*_ coding: utf-8 _*_
+import inspect
+import logging
+import os.path
+import re
+import time
+
+MY_LOG_INFO = logging.INFO
+MY_LOG_ERROR = logging.ERROR
+MY_LOG_DEBUG = logging.DEBUG
+MY_LOG_WARN = logging.WARNING
+MY_LOG_ALL = logging.DEBUG
+
+
+class mylog(object):
+
+    def __init__(self, log_name='log', log_path=None, log_level=None,
+                 file_log_level=None, stream_log_level=None, save_log2_file=False):
+        """
+        :param logger:
+               log_path：日志路径，默认为空，将保存至当前项目
+               file_log_level：日志文件日志级别
+               stream_log_level：控制台日志级别
+               save_log2_file:是否需要保存至日志文件，默认是FALSE，如果为TRUE，则log_path不能为空
+               log_level：日志级别，控制台会输出设置的级别及以上的日志，如设置info，会输出info级别和info级别以上的日志，这一点和日志文件的级别有本质的区别
+        """
+        self.__log_level = log_level
+        self.__file_log_level = file_log_level
+        self.__stream_log_level = stream_log_level
+        self.__save_log2_file = save_log2_file
+        self.__log_name = log_name
+        # 设置日志路径
+        self.__log_path = log_path
+
+        if self.__save_log2_file is True:
+            if self.__log_path is None:
+                raise Exception('The save_log2_file is true,you must set a log path')
+
+        # 日志一共分成5个等级，从高到低分别是：CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
+        # 保存日志时,会按照日志等级，保存该级别日志以及以下日志
+        if self.__log_level is None:
+            self.__log_level = MY_LOG_DEBUG
+        if self.__file_log_level is None:
+            self.__file_log_level = self.__log_level
+        if self.__stream_log_level is None:
+            self.__stream_log_level = self.__log_level
+
+        # 创建一个logger
+        self.__logger = logging.getLogger(self.__log_name)
+        self.__logger.setLevel(self.__log_level)
+
+        # 设置一些变量
+        self.__all_log_name = None
+        self.__info_log_name = None
+        self.__error_log_name = None
+        self.__debug_log_name = None
+        self.__warn_log_name = None
+
+        self.__all_file_handler = None
+        self.__info_file_handler = None
+        self.__error_file_handler = None
+        self.__debug_file_handler = None
+        self.__warn_file_handler = None
+        self.__stream_handler = None
+
+        # 设置formatter
+        __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s -file_name:%(filename)-8s ' \
+                       '-fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
+        self.__formatter = logging.Formatter(__format_str)
+
+        # 创建日志日期
+        self.__log_day = str(time.strftime('%Y-%m-%d', time.localtime(time.time())))
+
+    def __set_stream_handler(self):
+        # 再创建一个handler，用于输出到控制台
+        self.__stream_handler = logging.StreamHandler()
+        self.__stream_handler.setLevel(self.__stream_log_level)
+        # 控制台日志格式
+        self.__stream_handler.setFormatter(self.__formatter)
+        # 控制台handler
+        if not (self.__stream_handler in self.__logger.handlers):
+            self.__logger.addHandler(self.__stream_handler)
+
+    def __set_log_file_name(self):
+        # 如果不存在已经设置日志路径
+        if self.__log_path is None:
+            # os.getcwd()获取当前文件的路径，此时日志保存在当前工具类下log目录下，不建议不指定日志文件目录
+            path_dir = os.path.dirname(__file__) + '/log' + '/' + self.__log_day
+            # 如果该项目下没有log目录，创建log目录
+            if not os.path.exists(path_dir):
+                os.makedirs(path_dir)
+            # os.path.dirname()获取指定文件路径的上级路径
+            log_path = os.path.abspath(os.path.dirname(path_dir)) + '/log'
+        else:
+            # 否则，设置了路径就使用用户设置的路径
+            path_dir = self.__log_path + '/' + self.__log_day
+            # 最后为目录，不存在则创建
+            if not os.path.exists(path_dir):
+                os.makedirs(path_dir)
+
+        # 创建日志名称。
+        # rq = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+        # 拼接日志文件路径名称
+        self.__all_log_name = os.path.join(path_dir, self.__log_day + '-' + 'ALL' + '.log')
+        self.__info_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_INFO)) + '.log')
+        self.__error_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_ERROR)) + '.log')
+        self.__debug_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_DEBUG)) + '.log')
+        self.__warn_log_name = os.path.join(path_dir, self.__log_day + '-' + str(logging.getLevelName(MY_LOG_WARN)) + '.log')
+
+    def __set_file_handler(self):
+        # CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
+        # 创建一个通用的handler，用于写入日志文件，写入所有的日志级别
+        self.__all_file_handler = logging.FileHandler(self.__all_log_name, encoding='utf-8')
+        self.__all_file_handler.setLevel(self.__file_log_level)
+        # 创建一个info_handler，用于写入INFO日志文件，只写入info级别及以下的日志
+        self.__info_file_handler = logging.FileHandler(self.__info_log_name, encoding='utf-8')
+        self.__info_file_handler.setLevel(MY_LOG_INFO)
+        # 创建一个error_handler，用于写入ERROR日志文件，只写入error级别及以下的日志
+        self.__error_file_handler = logging.FileHandler(self.__error_log_name, encoding='utf-8')
+        self.__error_file_handler.setLevel(MY_LOG_ERROR)
+        # 创建一个debug_handler，用于写入DEBUG日志文件，写入debug级别及以下的日志
+        self.__debug_file_handler = logging.FileHandler(self.__debug_log_name, encoding='utf-8')
+        self.__debug_file_handler.setLevel(MY_LOG_DEBUG)
+        # 创建一个warn_handler，用于写入WARNING日志文件，写入WARNING级别及以下的日志
+        self.__warn_file_handler = logging.FileHandler(self.__warn_log_name, encoding='utf-8')
+        self.__warn_file_handler.setLevel(MY_LOG_WARN)
+
+    def __set_file_formatter(self):
+        # 日志文件日志格式
+        self.__all_file_handler.setFormatter(self.__formatter)
+        # 日志文件日志格式
+        self.__info_file_handler.setFormatter(self.__formatter)
+        # 日志文件日志格式
+        self.__error_file_handler.setFormatter(self.__formatter)
+        # 日志文件日志格式
+        self.__debug_file_handler.setFormatter(self.__formatter)
+        # 日志文件日志格式
+        self.__warn_file_handler.setFormatter(self.__formatter)
+
+    def __add_file_handler(self):
+        # if not self.__logger.handlers:
+        # 给logger添加handler
+        # 如果保存到文件
+        if not (self.__all_file_handler in self.__logger.handlers):
+            # 所有日志级别handler，如果不配置，则无法写入文件
+            self.__logger.addHandler(self.__all_file_handler)
+
+        if not (self.__info_file_handler in self.__logger.handlers):
+            # info日志级别handler，如果不配置，则无法写入文件
+            self.__logger.addHandler(self.__info_file_handler)
+
+        if not (self.__error_file_handler in self.__logger.handlers):
+            # error日志级别handler，如果不配置，则无法写入文件
+            self.__logger.addHandler(self.__error_file_handler)
+
+        if not (self.__debug_file_handler in self.__logger.handlers):
+            # debug日志级别handler，如果不配置，则无法写入文件
+            self.__logger.addHandler(self.__debug_file_handler)
+
+        if not (self.__warn_file_handler in self.__logger.handlers):
+            # warning日志级别handler，如果不配置，则无法写入文件
+            self.__logger.addHandler(self.__warn_file_handler)
+
+    def get_logger(self):
+        if self.__save_log2_file is True:
+            self.__set_log_file_name()
+            self.__set_file_handler()
+            self.__set_file_formatter()
+            self.__add_file_handler()
+        self.__set_stream_handler()
+        return self.__logger
+
+    @staticmethod
+    def __get_file_name_in_full_path(file_path):
+        return file_path.split('/')[-1]
+
+    # 以下方法来源于https://github.com/frankyaorenjie/Python-CLog
+    def get_meta_data(self):
+        frames = inspect.stack()
+        chain_list = []
+        for i in range(0, len(frames)):
+            _, file_path, _, func_name, _, _ = frames[i]
+            file_name = self.__get_file_name_in_full_path(file_path)
+            try:
+                args = re.findall('\((.*)\)', frames[i + 1][-2][0])[0]
+            except IndexError as e:
+                func_result = self.__get_class_from_frame(frames[2][0])
+                if func_result is None:
+                    func_name = ''
+                    args = ''
+                else:
+                    func_name = self.__get_class_from_frame(frames[2][0]).__name__
+                    args = ''
+            current_chain = '%s:%s(%s)' % (file_name, func_name, args)
+            chain_list.append(current_chain)
+        chain_list.reverse()
+        return ' --> '.join(chain_list[-4:-2])
+
+    @staticmethod
+    def __get_class_from_frame(fr):
+        args, _, _, value_dict = inspect.getargvalues(fr)
+        if len(args) and args[0] == 'self':
+            instance = value_dict.get('self', None)
+            if instance:
+                return getattr(instance, '__class__', None)
+        return None
+
+
+__self_my_log = None
+
+__myLogger = None
+
+
+def get_log(log_name='self_my_log', log_path=None, log_level=None, file_log_level=None,
+            stream_log_level=None, save_log2_file=False):
+    global __self_my_log
+    __self_my_log = mylog(log_name, log_path, log_level, file_log_level, stream_log_level, save_log2_file)
+    return __self_my_log
+
+
+def getLogger(log_name='self_my_log', log_path=None, log_level=None, file_log_level=None,
+              stream_log_level=None, save_log2_file=False):
+    global __self_my_log
+    __self_my_log = get_log(log_name, log_path, log_level, file_log_level, stream_log_level, save_log2_file)
+    if __self_my_log is None:
+        raise Exception('The global self_my_log is none,please set self_my_log')
+
+    global __myLogger
+    __myLogger = __self_my_log.get_logger()
+    return __myLogger
+
+
+def get_chain():
+    global __self_my_log
+    if __self_my_log is None:
+        return ''
+    else:
+        my_chain = mylog(log_name='self_my_log').get_meta_data()
+        return my_chain
+
+
+def log_info(message, my_logger=None):
+    if my_logger is None and __myLogger is not None:
+        my_logger = __myLogger
+    if my_logger is None and __myLogger is None:
+        my_logger = get_log().get_logger()
+    my_logger.info(message, extra={'chain': get_chain()})
+
+
+def log_error(message, my_logger=None):
+    if my_logger is None and __myLogger is not None:
+        my_logger = __myLogger
+    if my_logger is None and __myLogger is None:
+        my_logger = get_log().get_logger()
+    my_logger.error(message, extra={'chain': get_chain()})
+
+
+def log_warn(message, my_logger=None):
+    if my_logger is None and __myLogger is not None:
+        my_logger = __myLogger
+    if my_logger is None and __myLogger is None:
+        my_logger = get_log().get_logger()
+    my_logger.warning(message, extra={'chain': get_chain()})
+
+
+def log_debug(message, my_logger=None):
+    if my_logger is None and __myLogger is not None:
+        my_logger = __myLogger
+    if my_logger is None and __myLogger is None:
+        my_logger = get_log().get_logger()
+    my_logger.debug(message, extra={'chain': get_chain()})
+
+
+if __name__ == '__main__':
+    test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
+    log_info('ascasvasv', my_logger=test_looger)
+
+# error_log = mylog(logger='error').get_logger()
+
+# error_log.error('错误日志测试')  #
+
+# debug_log = mylog(logger='debug').get_logger()
+
+# debug_log.debug('debug')
