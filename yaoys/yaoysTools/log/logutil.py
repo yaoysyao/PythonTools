@@ -85,7 +85,6 @@ class mylog(object):
             self.__logger.addHandler(self.__stream_handler)
 
     def __remove_handler(self):
-        self.__logger.removeHandler(self.__info_file_handler)
         pass
 
     def __set_log_file_name(self):
