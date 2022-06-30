@@ -321,45 +321,45 @@ def log_debug(message, my_logger=None):
 
 
 # ==============================================demo=================================
-test_looger = getLogger(log_name='test')
-
-
-def a():
-    log_info('调用a方法', my_logger=test_looger)
-    b()
-
-
-def b():
-    log_info('调用b方法', my_logger=test_looger)
-    c()
-
-
-def c():
-    log_info('调用c方法', my_logger=test_looger)
-    d()
-
-
-def d():
-    log_info('调用d方法', my_logger=test_looger)
-    e()
-
-
-def e():
-    log_info('调用e方法', my_logger=test_looger)
+# test_looger = getLogger(log_name='test')
+#
+#
+# def a():
+#     log_info('调用a方法', my_logger=test_looger)
+#     b()
+#
+#
+# def b():
+#     log_info('调用b方法', my_logger=test_looger)
+#     c()
+#
+#
+# def c():
+#     log_info('调用c方法', my_logger=test_looger)
+#     d()
+#
+#
+# def d():
+#     log_info('调用d方法', my_logger=test_looger)
+#     e()
+#
+#
+# def e():
+#     log_info('调用e方法', my_logger=test_looger)
 
 
 if __name__ == '__main__':
-    # a()
+    a()
     # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
-    log_info('log_infod')
-    log_error('log_errora')
-    log_debug('log_debugs')
-    log_warn('log_warnd')
-
-    log_info('1')
-    log_error('2')
-    log_debug('3')
-    log_warn('4')
+    # log_info('log_infod')
+    # log_error('log_errora')
+    # log_debug('log_debugs')
+    # log_warn('log_warnd')
+    #
+    # log_info('1')
+    # log_error('2')
+    # log_debug('3')
+    # log_warn('4')
 
 # error_log = mylog(logger='error').get_logger()
 
