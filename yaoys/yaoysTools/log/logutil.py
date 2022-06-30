@@ -168,6 +168,7 @@ class mylog(object):
             self.__set_file_formatter()
             self.__add_file_handler()
         self.__set_stream_handler()
+        self.__logger.propagate = False
         return self.__logger
 
     @staticmethod
@@ -227,6 +228,8 @@ def getLogger(log_name='self_my_log', log_path=None, log_level=None, file_log_le
 
     global __myLogger
     __myLogger = __self_my_log.get_logger()
+
+    __myLogger.propagate = False
     return __myLogger
 
 
@@ -247,6 +250,7 @@ def log_info(message, my_logger=None):
     if my_logger.level != MY_LOG_INFO:
         my_logger.setLevel(MY_LOG_INFO)
     my_logger.info(message, extra={'chain': get_chain()})
+    my_logger.handlers = []
 
 
 def log_error(message, my_logger=None):
@@ -258,6 +262,7 @@ def log_error(message, my_logger=None):
     if my_logger.level != MY_LOG_ERROR:
         my_logger.setLevel(MY_LOG_ERROR)
     my_logger.error(message, extra={'chain': get_chain()})
+    my_logger.handlers = []
 
 
 def log_warn(message, my_logger=None):
@@ -269,6 +274,7 @@ def log_warn(message, my_logger=None):
     if my_logger.level != MY_LOG_WARN:
         my_logger.setLevel(MY_LOG_WARN)
     my_logger.warning(message, extra={'chain': get_chain()})
+    my_logger.handlers = []
 
 
 def log_debug(message, my_logger=None):
@@ -279,14 +285,20 @@ def log_debug(message, my_logger=None):
     if my_logger.level != MY_LOG_DEBUG:
         my_logger.setLevel(MY_LOG_DEBUG)
     my_logger.debug(message, extra={'chain': get_chain()})
+    my_logger.handlers = []
 
 
 if __name__ == '__main__':
-    # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
-    log_info('log_info')
-    log_error('log_error')
-    log_debug('log_error')
-    log_warn('log_warn')
+    # test_looger = getLogger(log_name='test')
+    log_info('log_infod')
+    log_error('log_errora')
+    log_debug('log_debugs')
+    log_warn('log_warnd')
+
+    log_info('1')
+    log_error('2')
+    log_debug('3')
+    log_warn('4')
 
 # error_log = mylog(logger='error').get_logger()
 
