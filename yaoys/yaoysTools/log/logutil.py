@@ -4,6 +4,7 @@ import logging
 import os.path
 import re
 import time
+import sys
 
 MY_LOG_INFO = logging.INFO
 MY_LOG_ERROR = logging.ERROR
@@ -65,7 +66,9 @@ class mylog(object):
 
         # 设置formatter
         # __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s -file_name:%(filename)-8s -fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
-        __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s  -chain:%(chain)s - %(lineno)d line -message: %(message)s'
+        # -chain:%(chain)s:调用链路
+        # - %(lineno)d line：行数,这种方法获取的行数为本文件中的写入日志的方法，并不是调用写日志的代码的行数，所以不用这种方法
+        __format_str = 'log_time:%(asctime)s -log_name:%(name)s -log_level:%(levelname)-s -log_filename:%(log_filename)s -func_name:%(func_name)s -line_number:%(line_number)d line -message: %(message)s'
         self.__formatter = logging.Formatter(__format_str)
 
         # 创建日志日期
@@ -244,6 +247,28 @@ def get_chain():
         return my_chain
 
 
+def _get_file_name():
+    # 获取调用该方法的文件的名称。0指的是当前文件，1表示上一个文件，以栈的方式保存调用链路
+    file_name = sys._getframe(2).f_code.co_filename
+    if file_name != '' and file_name.count('/') >= 3:
+        return '/'.join(str(i) for i in file_name.split('/')[-3:])
+    else:
+        return file_name
+
+
+def _get_code_function_name():
+    # 调用该函数的函数名字，如果没有被调用，则返回<module>
+    function_name = sys._getframe(2).f_code.co_name
+    if '<module>' in function_name:
+        function_name = '非方法调用(Not function)'
+    return function_name
+
+
+def _get_code_line_number():
+    # 调用该函数的函数名字，如果没有被调用，则返回<module>
+    return sys._getframe(2).f_lineno
+
+
 def log_info(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger
@@ -251,7 +276,7 @@ def log_info(message, my_logger=None):
         my_logger = get_log(log_level=MY_LOG_INFO).get_logger()
     if my_logger.level != MY_LOG_INFO:
         my_logger.setLevel(MY_LOG_INFO)
-    my_logger.info(message, extra={'chain': get_chain()})
+    my_logger.info(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     my_logger.handlers = []
 
 
@@ -263,7 +288,7 @@ def log_error(message, my_logger=None):
 
     if my_logger.level != MY_LOG_ERROR:
         my_logger.setLevel(MY_LOG_ERROR)
-    my_logger.error(message, extra={'chain': get_chain()})
+    my_logger.error(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     my_logger.handlers = []
 
 
@@ -275,7 +300,7 @@ def log_warn(message, my_logger=None):
 
     if my_logger.level != MY_LOG_WARN:
         my_logger.setLevel(MY_LOG_WARN)
-    my_logger.warning(message, extra={'chain': get_chain()})
+    my_logger.warning(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     my_logger.handlers = []
 
 
@@ -286,7 +311,7 @@ def log_debug(message, my_logger=None):
         my_logger = get_log(log_level=MY_LOG_DEBUG).get_logger()
     if my_logger.level != MY_LOG_DEBUG:
         my_logger.setLevel(MY_LOG_DEBUG)
-    my_logger.debug(message, extra={'chain': get_chain()})
+    my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     my_logger.handlers = []
 
 
