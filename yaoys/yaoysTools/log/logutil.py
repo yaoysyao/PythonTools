@@ -319,7 +319,6 @@ def log_debug(message, my_logger=None):
     my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
 
-
 # ==============================================demo=================================
 # test_looger = getLogger(log_name='test')
 #
@@ -348,18 +347,18 @@ def log_debug(message, my_logger=None):
 #     log_info('调用e方法', my_logger=test_looger)
 
 
-if __name__ == '__main__':
-    a()
-    # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
-    # log_info('log_infod')
-    # log_error('log_errora')
-    # log_debug('log_debugs')
-    # log_warn('log_warnd')
-    #
-    # log_info('1')
-    # log_error('2')
-    # log_debug('3')
-    # log_warn('4')
+# if __name__ == '__main__':
+#     a()
+#     # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
+#     # log_info('log_infod')
+#     # log_error('log_errora')
+#     # log_debug('log_debugs')
+#     # log_warn('log_warnd')
+#     #
+#     # log_info('1')
+#     # log_error('2')
+#     # log_debug('3')
+#     # log_warn('4')
 
 # error_log = mylog(logger='error').get_logger()
 
