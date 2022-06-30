@@ -168,6 +168,7 @@ class mylog(object):
             self.__set_file_formatter()
             self.__add_file_handler()
         self.__set_stream_handler()
+        # 日志重复输出，此设置无效
         self.__logger.propagate = False
         return self.__logger
 
@@ -229,6 +230,7 @@ def getLogger(log_name='self_my_log', log_path=None, log_level=None, file_log_le
     global __myLogger
     __myLogger = __self_my_log.get_logger()
 
+    # 日志重复输出，此设置无效
     __myLogger.propagate = False
     return __myLogger
 
