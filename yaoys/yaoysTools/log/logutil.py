@@ -84,6 +84,10 @@ class mylog(object):
         if not (self.__stream_handler in self.__logger.handlers):
             self.__logger.addHandler(self.__stream_handler)
 
+    def __remove_handler(self):
+        self.__logger.removeHandler(self.__info_file_handler)
+        pass
+
     def __set_log_file_name(self):
         # 如果不存在已经设置日志路径
         if self.__log_path is None:
@@ -171,7 +175,7 @@ class mylog(object):
             self.__set_file_formatter()
             self.__add_file_handler()
         self.__set_stream_handler()
-        # 日志重复输出，此设置无效
+        # 日志重复输出，此设置不确定是否有效
         self.__logger.propagate = False
         return self.__logger
 
@@ -274,10 +278,12 @@ def log_info(message, my_logger=None):
         my_logger = __myLogger
     if my_logger is None and __myLogger is None:
         my_logger = get_log(log_level=MY_LOG_INFO).get_logger()
+
     if my_logger.level != MY_LOG_INFO:
         my_logger.setLevel(MY_LOG_INFO)
     my_logger.info(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
-    my_logger.handlers = []
+    # 暂时取消以下代码，因为如果不取消在demo中调用a方法，只能输出a中的日志，其他的方法中不输出，原因是因为，每次调用的时候handler被清空了，导致控制台handler没有了
+    # my_logger.handlers = []
 
 
 def log_error(message, my_logger=None):
@@ -289,7 +295,7 @@ def log_error(message, my_logger=None):
     if my_logger.level != MY_LOG_ERROR:
         my_logger.setLevel(MY_LOG_ERROR)
     my_logger.error(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
-    my_logger.handlers = []
+    # my_logger.handlers = []
 
 
 def log_warn(message, my_logger=None):
@@ -301,7 +307,7 @@ def log_warn(message, my_logger=None):
     if my_logger.level != MY_LOG_WARN:
         my_logger.setLevel(MY_LOG_WARN)
     my_logger.warning(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
-    my_logger.handlers = []
+    # my_logger.handlers = []
 
 
 def log_debug(message, my_logger=None):
@@ -312,11 +318,40 @@ def log_debug(message, my_logger=None):
     if my_logger.level != MY_LOG_DEBUG:
         my_logger.setLevel(MY_LOG_DEBUG)
     my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
-    my_logger.handlers = []
+    # my_logger.handlers = []
+
+
+# ==============================================demo=================================
+test_looger = getLogger(log_name='test')
+
+
+def a():
+    log_info('调用a方法', my_logger=test_looger)
+    b()
+
+
+def b():
+    log_info('调用b方法', my_logger=test_looger)
+    c()
+
+
+def c():
+    log_info('调用c方法', my_logger=test_looger)
+    d()
+
+
+def d():
+    log_info('调用d方法', my_logger=test_looger)
+    e()
+
+
+def e():
+    log_info('调用e方法', my_logger=test_looger)
 
 
 if __name__ == '__main__':
-    # test_looger = getLogger(log_name='test')
+    # a()
+    # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
     log_info('log_infod')
     log_error('log_errora')
     log_debug('log_debugs')
