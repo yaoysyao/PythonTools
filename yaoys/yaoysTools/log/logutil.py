@@ -64,8 +64,8 @@ class mylog(object):
         self.__stream_handler = None
 
         # 设置formatter
-        __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s -file_name:%(filename)-8s ' \
-                       '-fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
+        # __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s -file_name:%(filename)-8s -fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
+        __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s  -chain:%(chain)s - %(lineno)d line -message: %(message)s'
         self.__formatter = logging.Formatter(__format_str)
 
         # 创建日志日期
@@ -243,7 +243,9 @@ def log_info(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger
     if my_logger is None and __myLogger is None:
-        my_logger = get_log().get_logger()
+        my_logger = get_log(log_level=MY_LOG_INFO).get_logger()
+    if my_logger.level != MY_LOG_INFO:
+        my_logger.setLevel(MY_LOG_INFO)
     my_logger.info(message, extra={'chain': get_chain()})
 
 
@@ -251,7 +253,10 @@ def log_error(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger
     if my_logger is None and __myLogger is None:
-        my_logger = get_log().get_logger()
+        my_logger = get_log(log_level=MY_LOG_ERROR).get_logger()
+
+    if my_logger.level != MY_LOG_ERROR:
+        my_logger.setLevel(MY_LOG_ERROR)
     my_logger.error(message, extra={'chain': get_chain()})
 
 
@@ -259,7 +264,10 @@ def log_warn(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger
     if my_logger is None and __myLogger is None:
-        my_logger = get_log().get_logger()
+        my_logger = get_log(log_level=MY_LOG_WARN).get_logger()
+
+    if my_logger.level != MY_LOG_WARN:
+        my_logger.setLevel(MY_LOG_WARN)
     my_logger.warning(message, extra={'chain': get_chain()})
 
 
@@ -267,13 +275,18 @@ def log_debug(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger
     if my_logger is None and __myLogger is None:
-        my_logger = get_log().get_logger()
+        my_logger = get_log(log_level=MY_LOG_DEBUG).get_logger()
+    if my_logger.level != MY_LOG_DEBUG:
+        my_logger.setLevel(MY_LOG_DEBUG)
     my_logger.debug(message, extra={'chain': get_chain()})
 
 
 if __name__ == '__main__':
-    test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
-    log_info('ascasvasv', my_logger=test_looger)
+    # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
+    log_info('log_info')
+    log_error('log_error')
+    log_debug('log_error')
+    log_warn('log_warn')
 
 # error_log = mylog(logger='error').get_logger()
 
