@@ -3,9 +3,14 @@ import setuptools  # 导入setuptools打包工具
 # cwd = Path(__file__).parent
 # filepath = "README.md"
 
+"""
+打包命令: python setup.py sdist
+twine upload dist/yaoys-python-tool-0.0.36.tar.gz
+"""
+
 setuptools.setup(
     name="yaoys-python-tool",  # 用自己的名替换其中的YOUR_USERNAME_
-    version="0.0.35",  # 包版本号，便于维护版本
+    version="0.0.37",  # 包版本号，便于维护版本
     author="YaoYuanshuai",  # 作者，可以写自己的姓名
     author_email="yaoys@mail.imu.edu.cn",  # 作者联系方式，可写自己的邮箱地址
     description="python工具类",  # 包的简述
