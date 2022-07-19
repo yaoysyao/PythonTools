@@ -5,6 +5,7 @@ import os.path
 import re
 import time
 import sys
+import colorlog
 
 MY_LOG_INFO = logging.INFO
 MY_LOG_ERROR = logging.ERROR
@@ -32,6 +33,23 @@ class mylog(object):
         self.__log_name = log_name
         # 设置日志路径
         self.__log_path = log_path
+
+        # 不同级别的日志颜色
+        # 以下转义码可用于格式字符串：
+        #
+        # {color}, fg_{color}, bg_{color}: 前景色和背景色。
+        # bold, bold_{color}, fg_bold_{color}, bg_bold_{color}: 粗体/明亮的颜色。
+        # thin, thin_{color}, fg_thin_{color}: 淡色（取决于终端）。
+        # reset：清除所有格式（前景色和背景色）。
+        # 可用的颜色名称为black、red、green、yellow、blue、 purple和。cyanwhite
+        # 如bg_white,白色背景
+        self.__log_colors_config = {
+            'DEBUG': 'white',  # cyan white
+            'INFO': 'green,fg_bold_green',
+            'WARNING': 'yellow,fg_bold_yellow',
+            'ERROR': 'red,fg_bold_red',
+            'CRITICAL': 'bold_red,fg_bold_bold_red',
+        }
 
         if self.__save_log2_file is True:
             if self.__log_path is None:
@@ -68,8 +86,18 @@ class mylog(object):
         # __format_str = 'time:%(asctime)s -log_name:%(name)s -level:%(levelname)-s -file_name:%(filename)-8s -fun_name:%(funcName)s -chain:%(chain)s - %(lineno)d line -message: %(message)s'
         # -chain:%(chain)s:调用链路
         # - %(lineno)d line：行数,这种方法获取的行数为本文件中的写入日志的方法，并不是调用写日志的代码的行数，所以不用这种方法
-        __format_str = 'log_time:%(asctime)s -log_name:%(name)s -log_level:%(levelname)-s -log_filename:%(log_filename)s -func_name:%(func_name)s -line_number:%(line_number)d line -message: %(message)s'
-        self.__formatter = logging.Formatter(__format_str)
+        # self.__format_str = 'log_time:%(asctime)s -log_name:%(name)s -log_level:%(levelname)-s -log_filename:%(log_filename)s -func_name:%(func_name)s -line_number:%(line_number)d line -message: %(message)s'
+        self.__format_str = '[%(asctime)s] [log_name:%(name)s] [%(levelname)s] [filename:%(log_filename)s] [func_name:%(func_name)s] [%(line_number)d line] -message:%(message)s'
+
+        self.__formatter = logging.Formatter(self.__format_str)
+        # 控制台日志输出格式，按照不同的颜色
+        self.__console_formatter = colorlog.ColoredFormatter(
+            # 格式
+            fmt='%(log_color)s' + self.__format_str,
+            # datefmt='%Y-%m-%d  %H:%M:%S',
+            # 颜色
+            log_colors=self.__log_colors_config
+        )
 
         # 创建日志日期
         self.__log_day = str(time.strftime('%Y-%m-%d', time.localtime(time.time())))
@@ -79,7 +107,7 @@ class mylog(object):
         self.__stream_handler = logging.StreamHandler()
         self.__stream_handler.setLevel(self.__stream_log_level)
         # 控制台日志格式
-        self.__stream_handler.setFormatter(self.__formatter)
+        self.__stream_handler.setFormatter(self.__console_formatter)
         # 控制台handler
         if not (self.__stream_handler in self.__logger.handlers):
             self.__logger.addHandler(self.__stream_handler)
@@ -319,6 +347,7 @@ def log_debug(message, my_logger=None):
     my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
 
+
 # ==============================================demo=================================
 # test_looger = getLogger(log_name='test')
 #
@@ -347,18 +376,18 @@ def log_debug(message, my_logger=None):
 #     log_info('调用e方法', my_logger=test_looger)
 
 
-# if __name__ == '__main__':
-#     a()
-#     # test_looger = getLogger(log_name='test', log_level=MY_LOG_INFO)
-#     # log_info('log_infod')
-#     # log_error('log_errora')
-#     # log_debug('log_debugs')
-#     # log_warn('log_warnd')
-#     #
-#     # log_info('1')
-#     # log_error('2')
-#     # log_debug('3')
-#     # log_warn('4')
+if __name__ == '__main__':
+    # a()
+    test_looger = getLogger(log_name='test')
+    log_info('log_infod')
+    log_error('log_errora')
+    log_debug('log_debugs')
+    log_warn('log_warnd')
+
+    log_info('1')
+    log_error('2')
+    log_debug('3')
+    log_warn('4')
 
 # error_log = mylog(logger='error').get_logger()
 
