@@ -6,7 +6,7 @@ Python version：3.9
 
 import time
 
-from yaoysTools.log import logutil
+import yaoysTools.log.logutil as logutil
 
 # 64位ID的划分
 WORKER_ID_BITS = 5

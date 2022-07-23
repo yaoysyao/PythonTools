@@ -17,7 +17,7 @@ MY_LOG_ALL = logging.DEBUG
 class mylog(object):
 
     def __init__(self, log_name='log', log_path=None, log_level=None,
-                 file_log_level=None, stream_log_level=None, save_log2_file=False):
+                 file_log_level=None, stream_log_level=None, save_log2_file=False, is_only_file=False):
         """
         :param logger:
                log_path：日志路径，默认为空，将保存至当前项目
@@ -33,6 +33,9 @@ class mylog(object):
         self.__log_name = log_name
         # 设置日志路径
         self.__log_path = log_path
+
+        # 只需要保存到文件，不需要在控制台输出,默认是FALSE
+        self.is_only_file = is_only_file
 
         # 不同级别的日志颜色
         # 以下转义码可用于格式字符串：
@@ -51,9 +54,9 @@ class mylog(object):
             'CRITICAL': 'bold_red,fg_bold_bold_red',
         }
 
-        if self.__save_log2_file is True:
+        if self.__save_log2_file is True or self.is_only_file is True:
             if self.__log_path is None:
-                raise Exception('The save_log2_file is true,you must set a log path')
+                raise Exception('The save_log2_file or is_only_file is true,you must set a log path')
 
         # 日志一共分成5个等级，从高到低分别是：CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
         # 保存日志时,会按照日志等级，保存该级别日志以及以下日志
@@ -196,12 +199,15 @@ class mylog(object):
             self.__logger.addHandler(self.__warn_file_handler)
 
     def get_logger(self):
-        if self.__save_log2_file is True:
+        if self.__save_log2_file is True or self.is_only_file is True:
             self.__set_log_file_name()
             self.__set_file_handler()
             self.__set_file_formatter()
             self.__add_file_handler()
-        self.__set_stream_handler()
+
+        # 如果设置不输出控制台为FALSE
+        if self.is_only_file is False:
+            self.__set_stream_handler()
         # 日志重复输出，此设置不确定是否有效
         self.__logger.propagate = False
         return self.__logger
@@ -248,16 +254,18 @@ __myLogger = None
 
 
 def get_log(log_name='self_my_log', log_path=None, log_level=None, file_log_level=None,
-            stream_log_level=None, save_log2_file=False):
+            stream_log_level=None, save_log2_file=False, is_only_file=False):
     global __self_my_log
-    __self_my_log = mylog(log_name, log_path, log_level, file_log_level, stream_log_level, save_log2_file)
+    __self_my_log = mylog(log_name=log_name, log_path=log_path, log_level=log_level, file_log_level=file_log_level,
+                          stream_log_level=stream_log_level, save_log2_file=save_log2_file, is_only_file=is_only_file)
     return __self_my_log
 
 
 def getLogger(log_name='self_my_log', log_path=None, log_level=None, file_log_level=None,
-              stream_log_level=None, save_log2_file=False):
+              stream_log_level=None, save_log2_file=False, is_only_file=False):
     global __self_my_log
-    __self_my_log = get_log(log_name, log_path, log_level, file_log_level, stream_log_level, save_log2_file)
+    __self_my_log = get_log(log_name=log_name, log_path=log_path, log_level=log_level, file_log_level=file_log_level,
+                            stream_log_level=stream_log_level, save_log2_file=save_log2_file, is_only_file=is_only_file)
     if __self_my_log is None:
         raise Exception('The global self_my_log is none,please set self_my_log')
 
@@ -346,6 +354,13 @@ def log_debug(message, my_logger=None):
         my_logger.setLevel(MY_LOG_DEBUG)
     my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
+
+
+def get_log_level(my_logger=None):
+    if my_logger is None:
+        return -1
+    else:
+        return my_logger.level
 
 
 # ==============================================demo=================================
