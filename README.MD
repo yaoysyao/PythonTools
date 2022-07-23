@@ -6,6 +6,12 @@
 
 ## 使用说明
 
+### 安装
+
+```python
+pip install yaoys-python-tool
+```
+
 ### log日志
 
 ```python

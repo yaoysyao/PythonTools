@@ -9,14 +9,14 @@ twine upload dist/yaoys-python-tool-0.0.36.tar.gz
 """
 
 setuptools.setup(
-    name="yaoys-python-tool",  # 用自己的名替换其中的YOUR_USERNAME_
+    name="yaoys-python-tool",  # pip库名称
     version="0.0.39",  # 包版本号，便于维护版本
-    author="YaoYuanshuai",  # 作者，可以写自己的姓名
-    author_email="yaoys@mail.imu.edu.cn",  # 作者联系方式，可写自己的邮箱地址
+    author="YaoYuanshuai",  # 作者
+    author_email="yys9508@qq.com",  # 联系方式
     description="python工具类",  # 包的简述
-    long_description="open(filepath, encoding='utf-8').read()",  # 包的详细介绍，一般在README.md文件内
+    long_description="此工具类致力于封装一些常用的python代码，目前支持log日志，progress进度条，mysql数据库操作，雪花算法唯一id，时间工具类等方法",  # 包的详细介绍，一般在README.md文件内
     long_description_content_type="text/markdown",
-    url="https://gitee.com/yys518/PythonTools.git",  # 自己项目地址，比如github的项目地址
+    url="https://github.com/yaoysyao/PythonTools.git",  # 项目地址
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
