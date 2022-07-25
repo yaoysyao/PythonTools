@@ -9,21 +9,28 @@
 ### 安装
 
 ```python
-pip install yaoys-python-tool
+pip
+install
+yaoys - python - tool
 ```
+
+## 更多例子请查看demo文件夹下相关代码
 
 ### log日志
 
 ```python
 # log日志demo
 from yaoysTools.log.logutil import getLogger, log_info, MY_LOG_INFO
+
 # 说明：如果设置保存日志到日志文件，则必须设置日志文件路径，此时 save_log2_file=True， log_path='../log'
 # 封装了log_info，log_error,log_warn,log_debug等方法
-#日志颜色将根据不同的日志等级设置为不同的颜色
+# 日志颜色将根据不同的日志等级设置为不同的颜色
 logger = getLogger('test', log_path='../log', log_level=MY_LOG_INFO, save_log2_file=True)
 log_info('test', my_logger=logger)
 # 运行结果如下：
-[2022-07-23 13:31:25,058] [log_name:test] [INFO] [filename:some_thing_test.py] [func_name:非方法调用(Not function)] [15 line] -message:test
+[2022 - 07 - 23 13: 31:25, 05
+8] [log_name: test] [INFO][filename:some_thing_test.py][func_name:非方法调用(Not
+function)] [15 line] - message: test
 # 可在log文件中查看到相关日志
 ```
 
@@ -35,6 +42,7 @@ log_info('test', my_logger=logger)
 # 针对以上源码进行了封装，修改，增加将进度保存到日志文件中
 from time import sleep
 from yaoysTools.progress.progressUtil import PROGRESS_TYPE_PIXELBAR, definitionProgressBar
+
 # 进度条可选择的样式有多种，如果不知道具体的总的长度，可以使用spinner，原作者提供了多种spinner
 PROGRESS_TYPE_BAR = 'Bar'
 PROGRESS_TYPE_CHARGING_BAR = 'ChargingBar'
@@ -50,18 +58,18 @@ PROGRESS_TYPE_LINESPINNER = 'LineSpinner'
 PROGRESS_TYPE_PIXELSPINNER = 'PixelSpinner'
 # 注意，如果需要将进度保存到日志中，必须设置 is_save_log=True，并且设置log日志的路径
 # 你还可以自己定义自己的logger.如果不定义，将采用默认的logger,自定义logger使用的方法是log日志中的getLogger
-#自定义logger时，同样的如果需要将进度保存到日志中，必须设置 is_save_log=True，并且设置log日志的路径，必须设置is_only_file=True，否则会在控制台输出进度
+# 自定义logger时，同样的如果需要将进度保存到日志中，必须设置 is_save_log=True，并且设置log日志的路径，必须设置is_only_file=True，否则会在控制台输出进度
 # logger = getLogger(self.message, log_level=MY_LOG_INFO, log_path=self.log_path, is_only_file=True)
 # 如果采用默认的logger，则不需要设置my_logger=logger
 bar = definitionProgressBar(progress_type=PROGRESS_TYPE_PIXELBAR,
-                            count=100, is_save_log=True, log_path='../log',my_logger=logger).get_progress()
+                            count=100, is_save_log=True, log_path='../log', my_logger=logger).get_progress()
 for i in range(100):
     # Do some work
     sleep(0.01)
     bar.next()
 bar.finish()
 # 控制台运行结果：
-Progress |⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿| 100/100
+Progress |⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ | 100 / 100
 # log日志输出进度如下：
 ```
 
