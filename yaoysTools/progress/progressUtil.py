@@ -18,7 +18,7 @@ PROGRESS_TYPE_LINESPINNER = 'LineSpinner'
 PROGRESS_TYPE_PIXELSPINNER = 'PixelSpinner'
 
 
-class definitionProgressBar(object):
+class definitionProgress(object):
     def __init__(self, progress_type=PROGRESS_TYPE_BAR, count=0, message='Progress', check_tty=False, is_save_log=False, logger=None, log_path=None):
         self.progress_type = progress_type
         self.count = count

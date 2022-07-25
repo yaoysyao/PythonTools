@@ -12,6 +12,7 @@
 from timeit import default_timer
 
 import pymysql
+import pymysql.cursors
 from dbutils.pooled_db import PooledDB
 
 
