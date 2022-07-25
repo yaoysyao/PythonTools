@@ -8,10 +8,8 @@
 
 ### 安装
 
-```python
-pip
-install
-yaoys - python - tool
+```
+pip install yaoys-python-tool
 ```
 
 ## 更多例子请查看demo文件夹下相关代码
