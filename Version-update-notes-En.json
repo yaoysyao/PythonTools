@@ -1,4 +1,8 @@
 {
+  "0.0.45": {
+    "1": "Fix the error that the README.MD cannot be found during installation",
+    "2": "Upgrade to 0.0.45"
+  },
   "0.0.41": {
     "1": "The log module adds custom log color parameters",
     "2": "The log module adds a custom log format output parameter",
