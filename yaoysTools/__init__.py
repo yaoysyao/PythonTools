@@ -1,4 +1,3 @@
-# from log.logutil import mylog
 import yaoysTools.log.logutil as yaoys_log
 import yaoysTools.database.mysql as yaoys_mysql
 import yaoysTools.uniqueid.snowflake as yaoys_snowflakeid
