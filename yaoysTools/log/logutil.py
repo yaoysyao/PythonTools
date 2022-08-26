@@ -16,26 +16,29 @@ MY_LOG_ALL = logging.DEBUG
 
 class mylog(object):
 
-    def __init__(self, log_name='log', log_path=None, log_level=None,
-                 file_log_level=None, stream_log_level=None, save_log2_file=False, is_only_file=False):
+    def __init__(self, **kwargs):
         """
-        :param logger:
-               log_path：日志路径，默认为空，将保存至当前项目
+        :param
+               log_name：日志名称
+               log_path：日志路径，若save_log2_file=True，则该参数不能为空
+               log_level：日志级别，如果file_log_level和stream_log_level为None，则默认使用log_level级别，如果log_level也为None，则三者同时默认级别为Info级别
+               使用控制台会输出设置的级别及以上的日志，如设置info，会输出info级别和info级别以上的日志，这一点和日志文件的级别有本质的区别
                file_log_level：日志文件日志级别
                stream_log_level：控制台日志级别
                save_log2_file:是否需要保存至日志文件，默认是FALSE，如果为TRUE，则log_path不能为空
-               log_level：日志级别，控制台会输出设置的级别及以上的日志，如设置info，会输出info级别和info级别以上的日志，这一点和日志文件的级别有本质的区别
+               is_only_file:日志只保存至日志文件，不在控制台输出，该参数主要用在进度条模块中，设置进度条保存在日志文件中时，需要设置该参数为True，保证不在控制台输出日志进度而保存到文件
         """
-        self.__log_level = log_level
-        self.__file_log_level = file_log_level
-        self.__stream_log_level = stream_log_level
-        self.__save_log2_file = save_log2_file
-        self.__log_name = log_name
+
+        self.__log_level = kwargs.get('log_level', MY_LOG_INFO)
+        self.__file_log_level = kwargs.get('file_log_level', None)
+        self.__stream_log_level = kwargs.get('stream_log_level', None)
+        self.__save_log2_file = kwargs.get('save_log2_file', None)
+        self.__log_name = kwargs.get('log_name', 'log')
         # 设置日志路径
-        self.__log_path = log_path
+        self.__log_path = kwargs.get('log_path', None)
 
         # 只需要保存到文件，不需要在控制台输出,默认是FALSE
-        self.is_only_file = is_only_file
+        self.is_only_file = kwargs.get('is_only_file', None)
 
         # 不同级别的日志颜色
         # 以下转义码可用于格式字符串：
@@ -46,13 +49,13 @@ class mylog(object):
         # reset：清除所有格式（前景色和背景色）。
         # 可用的颜色名称为black、red、green、yellow、blue、 purple和。cyanwhite
         # 如bg_white,白色背景
-        self.__log_colors_config = {
+        self.__log_colors_config = kwargs.get('log_colors_config', {
             'DEBUG': 'white',  # cyan white
             'INFO': 'green,fg_bold_green',
             'WARNING': 'yellow,fg_bold_yellow',
             'ERROR': 'red,fg_bold_red',
             'CRITICAL': 'bold_red,fg_bold_bold_red',
-        }
+        })
 
         if self.__save_log2_file is True or self.is_only_file is True:
             if self.__log_path is None:
@@ -90,7 +93,7 @@ class mylog(object):
         # -chain:%(chain)s:调用链路
         # - %(lineno)d line：行数,这种方法获取的行数为本文件中的写入日志的方法，并不是调用写日志的代码的行数，所以不用这种方法
         # self.__format_str = 'log_time:%(asctime)s -log_name:%(name)s -log_level:%(levelname)-s -log_filename:%(log_filename)s -func_name:%(func_name)s -line_number:%(line_number)d line -message: %(message)s'
-        self.__format_str = '[%(asctime)s] [log_name:%(name)s] [%(levelname)s] [filename:%(log_filename)s] [func_name:%(func_name)s] [%(line_number)d line] -message:%(message)s'
+        self.__format_str = kwargs.get('format_str', '[%(asctime)s][log_name:%(name)s][%(levelname)s][filename:%(log_filename)s][func_name:%(func_name)s][%(line_number)d line]-message:%(message)s')
 
         self.__formatter = logging.Formatter(self.__format_str)
         # 控制台日志输出格式，按照不同的颜色
@@ -361,53 +364,3 @@ def get_log_level(my_logger=None):
         return -1
     else:
         return my_logger.level
-
-
-# ==============================================demo=================================
-# test_looger = getLogger(log_name='test')
-#
-#
-# def a():
-#     log_info('调用a方法', my_logger=test_looger)
-#     b()
-#
-#
-# def b():
-#     log_info('调用b方法', my_logger=test_looger)
-#     c()
-#
-#
-# def c():
-#     log_info('调用c方法', my_logger=test_looger)
-#     d()
-#
-#
-# def d():
-#     log_info('调用d方法', my_logger=test_looger)
-#     e()
-#
-#
-# def e():
-#     log_info('调用e方法', my_logger=test_looger)
-
-
-if __name__ == '__main__':
-    # a()
-    test_looger = getLogger(log_name='test')
-    log_info('log_infod')
-    log_error('log_errora')
-    log_debug('log_debugs')
-    log_warn('log_warnd')
-
-    log_info('1')
-    log_error('2')
-    log_debug('3')
-    log_warn('4')
-
-# error_log = mylog(logger='error').get_logger()
-
-# error_log.error('错误日志测试')  #
-
-# debug_log = mylog(logger='debug').get_logger()
-
-# debug_log.debug('debug')

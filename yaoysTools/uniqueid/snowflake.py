@@ -94,13 +94,12 @@ class snowFlakeId(object):
             timestamp = self._gen_timestamp()
         return timestamp
 
-
-def get_id():
-    worker = snowFlakeId(1, 2, 0)
-    for x in range(1, 10):
-        # print(worker.get_id())
-        logutil.log_info(worker.get_id(), my_logger=logger)
-
-
-if __name__ == '__main__':
-    get_id()
+# def get_id():
+#     worker = snowFlakeId(1, 2, 0)
+#     for x in range(1, 10):
+#         # print(worker.get_id())
+#         logutil.log_info(worker.get_id(), my_logger=logger)
+#
+#
+# if __name__ == '__main__':
+#     get_id()

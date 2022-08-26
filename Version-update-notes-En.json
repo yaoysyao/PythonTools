@@ -1,0 +1,8 @@
+{
+  "0.0.41": {
+    "1": "The log module adds custom log color parameters",
+    "2": "The log module adds a custom log format output parameter",
+    "3": "The progress bar module modifies the source code, increases the progress bar time and percentage",
+    "4": "Simplify code logic"
+  }
+}

@@ -10,7 +10,7 @@ twine upload dist/yaoys-python-tool-0.0.36.tar.gz
 
 setuptools.setup(
     name="yaoys-python-tool",  # pip库名称
-    version="0.0.40",  # 包版本号，便于维护版本
+    version="0.0.41",  # 包版本号，便于维护版本
     author="YaoYuanshuai",  # 作者
     author_email="yys9508@qq.com",  # 联系方式
     description="python工具类",  # 包的简述

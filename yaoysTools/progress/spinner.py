@@ -23,11 +23,30 @@ class Spinner(Infinite):
     phases = ('-', '\\', '|', '/')
     hide_cursor = True
 
+    time_suffix = ' %(elapsed_td)ds '
+    bar_time = ''
+
     def update(self):
         i = self.index % len(self.phases)
         message = self.message % self
-        line = ''.join([message, self.phases[i]])
+        self.get_show_time()
+        line = ''.join([message, self.phases[i], self.bar_time])
         self.writeln(line)
+
+    def get_show_time(self):
+        if self.need_show_time is False:
+            self.bar_time = ''
+        else:
+            if self.show_time_type == 'elapsed':
+                self.time_suffix = ' %(elapsed)ds '
+                self.bar_time = self.time_suffix % self
+            elif self.show_time_type == 'eta':
+                self.time_suffix = ' %(eta)ds '
+                self.bar_time = self.time_suffix % self
+            elif self.show_time_type == 'elapsed_td':
+                self.bar_time = ' ' + str(self.elapsed_td) + ' '
+            elif self.show_time_type == 'eta_td':
+                self.bar_time = ' '
 
 
 class PieSpinner(Spinner):

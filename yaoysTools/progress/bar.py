@@ -25,7 +25,9 @@ from .colors import color
 
 class Bar(Progress):
     width = 32
-    suffix = '%(index)d/%(max)d'
+    suffix = '%(index)d/%(max)d  %(percent).2f%%'
+    time_suffix = ' %(elapsed_td)ds '
+    bar_time = ''
     bar_prefix = ' |'
     bar_suffix = '| '
     empty_fill = ' '
@@ -40,9 +42,26 @@ class Bar(Progress):
         bar = color(self.fill * filled_length, fg=self.color)
         empty = self.empty_fill * empty_length
         suffix = self.suffix % self
+
+        self.get_show_time()
         line = ''.join([message, self.bar_prefix, bar, empty, self.bar_suffix,
-                        suffix])
+                        suffix, self.bar_time])
         self.writeln(line)
+
+    def get_show_time(self):
+        if self.need_show_time is False:
+            self.bar_time = ''
+        else:
+            if self.show_time_type == 'elapsed':
+                self.time_suffix = ' %(elapsed)ds '
+                self.bar_time = self.time_suffix % self
+            elif self.show_time_type == 'eta':
+                self.time_suffix = ' %(eta)ds '
+                self.bar_time = self.time_suffix % self
+            elif self.show_time_type == 'elapsed_td':
+                self.bar_time = ' ' + str(self.elapsed_td) + ' '
+            elif self.show_time_type == 'eta_td':
+                self.bar_time = ' ' + str(self.eta_td) + ' '
 
 
 class ChargingBar(Bar):
@@ -87,7 +106,10 @@ class IncrementalBar(Bar):
 
 
 class PixelBar(IncrementalBar):
-    phases = ('⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿')
+    if sys.platform.startswith('win'):
+        phases = ('⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿')
+    else:
+        phases = ('⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿')
 
 
 class ShadyBar(IncrementalBar):

@@ -174,72 +174,71 @@ class UsingMysql(object):
 以下为测试
 """
 
-
-def delete_one(cursor, name):
-    sql = 'delete from user where name = %s'
-    params = name
-    cursor.execute(sql, params)
-    print('--- 已删除名字为%s. ' % name)
-
-
-def select_one(cursor):
-    sql = 'select * from user'
-    cursor.execute(sql)
-    return cursor.fetchone()
-
-
-def update_by_pk(cursor, name, pk):
-    sql = "update user set name = '%s' where id = %d" % (name, pk)
-
-    cursor.execute(sql)
-
-
-# 修改记录
-def check_update(cursor):
-    # 查找一条记录
-    data = select_one(cursor)
-    pk = data['id']
-    print('--- {0}: '.format(data))
-
-    # 修改名字
-    new_name = 'aaaa'
-    update_by_pk(cursor, new_name, pk)
-
-    # 查看
-    select_one_by_name(cursor, new_name)
-
-
-def select_one_by_name(cursor, name):
-    sql = 'select * from user where name = %s'
-    params = name
-    cursor.execute(sql, params)
-    data = cursor.fetchone()
-    if data:
-        print('--- 已找到名字为%s. ' % data['name'])
-    else:
-        print('--- 名字为%s的已经没有了' % name)
-
-
-if __name__ == '__main__':
-    host = 'localhost'
-    port = 3306
-    db = 'test'
-    user = 'root'
-    password = '123456'
-    with UsingMysql(host=host, port=port, dbname=db, username=user, password=password, log_time=True) as um:
-        um.cursor.execute("select count(id) as total from user")
-        data = um.cursor.fetchone()
-        print("-- 当前数量: %d " % data['total'])
-
-        um.cursor.execute("select * from user")
-        data = um.cursor.fetchone()
-        print("-- 单条记录: {0} ".format(data))
-
-    with UsingMysql(host=host, port=port, dbname=db, username=user, password=password, log_time=True) as um:
-        sql = "insert into user(name, age) values(%s, %s)"
-        params = ("user111", 25)
-        um.cursor.execute(sql, params)
-
-        um.cursor.execute("select * from user")
-        data = um.cursor.fetchall()
-        print("-- 记录: {0} ".format(data))
+# def delete_one(cursor, name):
+#     sql = 'delete from user where name = %s'
+#     params = name
+#     cursor.execute(sql, params)
+#     print('--- 已删除名字为%s. ' % name)
+#
+#
+# def select_one(cursor):
+#     sql = 'select * from user'
+#     cursor.execute(sql)
+#     return cursor.fetchone()
+#
+#
+# def update_by_pk(cursor, name, pk):
+#     sql = "update user set name = '%s' where id = %d" % (name, pk)
+#
+#     cursor.execute(sql)
+#
+#
+# # 修改记录
+# def check_update(cursor):
+#     # 查找一条记录
+#     data = select_one(cursor)
+#     pk = data['id']
+#     print('--- {0}: '.format(data))
+#
+#     # 修改名字
+#     new_name = 'aaaa'
+#     update_by_pk(cursor, new_name, pk)
+#
+#     # 查看
+#     select_one_by_name(cursor, new_name)
+#
+#
+# def select_one_by_name(cursor, name):
+#     sql = 'select * from user where name = %s'
+#     params = name
+#     cursor.execute(sql, params)
+#     data = cursor.fetchone()
+#     if data:
+#         print('--- 已找到名字为%s. ' % data['name'])
+#     else:
+#         print('--- 名字为%s的已经没有了' % name)
+#
+#
+# if __name__ == '__main__':
+#     host = 'localhost'
+#     port = 3306
+#     db = 'test'
+#     user = 'root'
+#     password = '123456'
+#     with UsingMysql(host=host, port=port, dbname=db, username=user, password=password, log_time=True) as um:
+#         um.cursor.execute("select count(id) as total from user")
+#         data = um.cursor.fetchone()
+#         print("-- 当前数量: %d " % data['total'])
+#
+#         um.cursor.execute("select * from user")
+#         data = um.cursor.fetchone()
+#         print("-- 单条记录: {0} ".format(data))
+#
+#     with UsingMysql(host=host, port=port, dbname=db, username=user, password=password, log_time=True) as um:
+#         sql = "insert into user(name, age) values(%s, %s)"
+#         params = ("user111", 25)
+#         um.cursor.execute(sql, params)
+#
+#         um.cursor.execute("select * from user")
+#         data = um.cursor.fetchall()
+#         print("-- 记录: {0} ".format(data))

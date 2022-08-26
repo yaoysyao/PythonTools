@@ -33,6 +33,17 @@ __version__ = '1.6'
 HIDE_CURSOR = '\x1b[?25l'
 SHOW_CURSOR = '\x1b[?25h'
 
+'''
+The show time type is : avg:	simple moving average time per item (in seconds)
+                        elapsed:	elapsed time in seconds
+                        elapsed_td:	elapsed as a timedelta (useful for printing as a string)
+                        eta:	avg * remaining
+                        eta_td:	eta as a timedelta (useful for printing as a string)
+if you want to define the show time type,you must set the need_show_time is True
+
+if you use spinner,you don't use eta and eta_td
+'''
+
 
 class Infinite(object):
     file = stderr
@@ -47,8 +58,6 @@ class Infinite(object):
         self._avg_update_ts = self.start_ts
         self._ts = self.start_ts
         self._xput = deque(maxlen=self.sma_window)
-        for key, val in kwargs.items():
-            setattr(self, key, val)
 
         self._max_width = 0
         self._hidden_cursor = False
@@ -56,6 +65,9 @@ class Infinite(object):
 
         self.is_save_log = kwargs.get('is_save_log', False)
         self.logger = kwargs.get('logger', None)
+        self.check_tty = kwargs.get('check_tty', False)
+        self.need_show_time = kwargs.get('need_show_time', True)
+        self.show_time_type = kwargs.get('show_time_type', 'elapsed_td')
         if self.logger is not None:
             self.log_level = get_log_level(my_logger=self.logger)
         else:
