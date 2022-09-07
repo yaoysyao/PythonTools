@@ -1,4 +1,7 @@
 {
+  "0.0.47": {
+    "1": "Optimize the log output format"
+  },
   "0.0.46": {
     "1": "Optimize the log output format",
     "2": "Some other code optimizations",

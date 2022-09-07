@@ -295,6 +295,8 @@ def _get_file_name():
     file_name = sys._getframe(2).f_code.co_filename
     if file_name != '' and file_name.count('/') >= 3:
         return '/'.join(str(i) for i in file_name.split('/')[-1:])
+    elif file_name != '' and file_name.count('\\') >= 3:
+        return '\\'.join(str(i) for i in file_name.split('\\')[-1:])
     else:
         return file_name
 
