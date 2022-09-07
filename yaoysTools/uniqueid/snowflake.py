@@ -1,6 +1,6 @@
 '''
 Python 版本snowflake 雪花算法
-Python version：3.9
+Python version：3.6
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
 

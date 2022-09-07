@@ -7,7 +7,8 @@ import time
 import datetime
 import calendar
 
-DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+DATETIME_FORMAT = "%Y-%m-%d"
+SPACE_FORMAT = " "
 TIME_FORMAT = "%H:%M:%S"
 
 
@@ -25,7 +26,7 @@ def generate_13timestamp():
 
 # 当前日期  格式%Y-%m-%d %H:%M:%S
 def curDatetime():
-    return datetime.datetime.strftime(datetime.datetime.now(), DATETIME_FORMAT)
+    return datetime.datetime.strftime(datetime.datetime.now(), DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
 
 
 # 当前日期  格式%Y-%m-%d
@@ -40,23 +41,23 @@ def curTime():
 
 # 秒转日期
 def seconds_2Datetime(seconds):
-    return time.strftime(DATETIME_FORMAT, time.localtime(seconds))
+    return time.strftime(DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT, time.localtime(seconds))
 
 
 # 毫秒转日期
 def milis_2datetime(milix):
-    return time.strftime(DATETIME_FORMAT, time.localtime(milix // 1000))
+    return time.strftime(DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT, time.localtime(milix // 1000))
 
 
 # 日期转13位毫秒
 def datetime_2_13milis(datetimestr):
-    strf = time.strptime(datetimestr, DATETIME_FORMAT)
+    strf = time.strptime(datetimestr, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return int(time.mktime(strf)) * 1000
 
 
 # 日期转10位毫秒
 def datetime_2_10milis(datetimestr):
-    strf = time.strptime(datetimestr, DATETIME_FORMAT)
+    strf = time.strptime(datetimestr, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return int(time.mktime(strf))
 
 
@@ -110,14 +111,14 @@ def format_datetime(dt):
     return datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
 
-def datetime_2string(dt=None, fmt=DATETIME_FORMAT):
+def datetime_2string(dt=None, fmt=DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT):
     """将datetime类型转换为字符串"""
     if not dt:
         dt = datetime.datetime.now()
     return datetime.datetime.strftime(dt, fmt)
 
 
-def string_2datetime(dt_str, fmt=DATETIME_FORMAT):
+def string_2datetime(dt_str, fmt=DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT):
     """
     将字符串转换为datetime类型
     >>> string_2datetime("2011-09-07 12:30:09")
@@ -144,7 +145,7 @@ def get_start_datetime(dt=None):
         dt = datetime.date.today()
     if isinstance(dt, datetime.date):
         dt_str = dt.strftime("%Y-%m-%d") + " 00:00:00"
-        start = datetime.datetime.strptime(dt_str, DATETIME_FORMAT)
+        start = datetime.datetime.strptime(dt_str, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return start
 
 
@@ -155,7 +156,7 @@ def get_end_datetime(dt=None):
         dt = datetime.date.today()
     if isinstance(dt, datetime.date):
         dt_str = dt.strftime("%Y-%m-%d") + " 23:59:59"
-        end = datetime.datetime.strptime(dt_str, DATETIME_FORMAT)
+        end = datetime.datetime.strptime(dt_str, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return end
 
 
@@ -166,7 +167,7 @@ def get_start_hour(dt=None):
         dt = datetime.date.today()
     if isinstance(dt, datetime.date):
         dt_str = dt.strftime("%Y-%m-%d %H") + ":00:00"
-        start = datetime.datetime.strptime(dt_str, DATETIME_FORMAT)
+        start = datetime.datetime.strptime(dt_str, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return start
 
 
@@ -177,7 +178,7 @@ def get_end_hour(dt=None):
         dt = datetime.date.today()
     if isinstance(dt, datetime.date):
         dt_str = dt.strftime("%Y-%m-%d %H") + ":59:59"
-        end = datetime.datetime.strptime(dt_str, DATETIME_FORMAT)
+        end = datetime.datetime.strptime(dt_str, DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT)
     return end
 
 
@@ -372,7 +373,7 @@ def get_flday_of_month(year=None, month=None):
     return fd_of_month, ld_of_month
 
 
-def is_valid_datetime(dt_str, fmt=DATETIME_FORMAT):
+def is_valid_datetime(dt_str, fmt=DATETIME_FORMAT + SPACE_FORMAT + TIME_FORMAT):
     """字符转换成时间，有转换成功标志"""
     valid = True
     result = None
@@ -386,17 +387,6 @@ def is_valid_datetime(dt_str, fmt=DATETIME_FORMAT):
     return valid, result
 
 
-def format_datetime_2date(dt):
-    """
-    将mongodb保存的日期时间格式转为日期格式
-    :param dt: mongodb保存的datetime日期时间格式
-    :return: 返回转换后的日期格式（datetime.date类型）
-    """
-    if not dt:
-        return None
-    return datetime.date(dt.year, dt.month, dt.day)
-
-
 def calculate_interval_days(begin_date, end_date=datetime.date.today()):
     """
     计算给定的两个日期间隔天数,默认计算给定天数到今天的间隔
@@ -404,8 +394,21 @@ def calculate_interval_days(begin_date, end_date=datetime.date.today()):
     :param end_date: 结束时间（datetime.date类型）
     :return: 返回间隔天数（int类型）
     """
-    if begin_date is not None and begin_date <= end_date:
-        delta = (end_date - begin_date).days
+    if begin_date is not None:
+        if begin_date <= end_date:
+            delta = (end_date - begin_date).days
+        else:
+            delta = (begin_date - end_date).days
     else:
         delta = 0
     return delta
+
+
+# 斜杠形式的日期格式转为横杠格式 8/12/2008 =>2008-8-12
+def get_slash_date2_horizontal(date=None):
+    if date is None:
+        raise Exception('The date is None')
+    year = date.split('/')[2]
+    month = date.split('/')[0]
+    day = date.split('/')[1]
+    return string_2datetime(dt_str=(str(year) + '-' + str(month) + '-' + str(day)), fmt=DATETIME_FORMAT)

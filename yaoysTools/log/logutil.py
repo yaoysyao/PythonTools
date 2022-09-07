@@ -93,7 +93,7 @@ class mylog(object):
         # -chain:%(chain)s:调用链路
         # - %(lineno)d line：行数,这种方法获取的行数为本文件中的写入日志的方法，并不是调用写日志的代码的行数，所以不用这种方法
         # self.__format_str = 'log_time:%(asctime)s -log_name:%(name)s -log_level:%(levelname)-s -log_filename:%(log_filename)s -func_name:%(func_name)s -line_number:%(line_number)d line -message: %(message)s'
-        self.__format_str = kwargs.get('format_str', '[%(asctime)s][log_name:%(name)s][%(levelname)s][filename:%(log_filename)s][func_name:%(func_name)s][%(line_number)d line]-message:%(message)s')
+        self.__format_str = kwargs.get('format_str', '[%(asctime)s][%(name)s][%(levelname)s][%(log_filename)s][%(line_number)d line] message:%(message)s')
 
         self.__formatter = logging.Formatter(self.__format_str)
         # 控制台日志输出格式，按照不同的颜色
@@ -102,7 +102,8 @@ class mylog(object):
             fmt='%(log_color)s' + self.__format_str,
             # datefmt='%Y-%m-%d  %H:%M:%S',
             # 颜色
-            log_colors=self.__log_colors_config
+            log_colors=self.__log_colors_config,
+            datefmt='%Y-%m-%d %H:%M:%S'
         )
 
         # 创建日志日期
@@ -293,7 +294,7 @@ def _get_file_name():
     # 获取调用该方法的文件的名称。0指的是当前文件，1表示上一个文件，以栈的方式保存调用链路
     file_name = sys._getframe(2).f_code.co_filename
     if file_name != '' and file_name.count('/') >= 3:
-        return '/'.join(str(i) for i in file_name.split('/')[-3:])
+        return '/'.join(str(i) for i in file_name.split('/')[-1:])
     else:
         return file_name
 
@@ -311,6 +312,7 @@ def _get_code_line_number():
     return sys._getframe(2).f_lineno
 
 
+# 'chain': get_chain() 输出调用链路，无实际作用
 def log_info(message, my_logger=None):
     if my_logger is None and __myLogger is not None:
         my_logger = __myLogger

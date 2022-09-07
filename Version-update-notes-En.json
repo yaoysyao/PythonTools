@@ -1,4 +1,10 @@
 {
+  "0.0.46": {
+    "1": "Optimize the log output format",
+    "2": "Some other code optimizations",
+    "3": "Time util optimizations",
+    "4": "update to 0.0.46"
+  },
   "0.0.45": {
     "1": "Fix the error that the README.MD cannot be found during installation",
     "2": "Upgrade to 0.0.45"
