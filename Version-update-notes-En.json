@@ -1,4 +1,7 @@
 {
+  "0.0.49": {
+    "1": "add data split"
+  },
   "0.0.47": {
     "1": "Optimize the log output format"
   },
