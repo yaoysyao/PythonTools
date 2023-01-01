@@ -14,6 +14,17 @@ pip install yaoys-python-tool
 
 ## 更多例子请查看demo文件夹下相关代码
 
+## 目前已经支持的功能
+
+1. log日志记录，包括打印至控制台和保存到文件，输出到控制台支持针对不同级别的日志设置不同的颜色
+2. 进度条展示：支持多种样式的进度条，并且支持将进度保存到log日志文件
+3. 数据集划分，包括划分为训练数据集，测试数据集，验证集，划分方式可以是使用pandas读取后的数据格式(datautil)
+   ，也可以直接使用文件路径，使用文件路径的方式暂时只支持划分测试集和训练集，文件格式为csv或者TXT(split_files)
+   ,具体使用可查看demo/data/dataDemo.py
+4. 唯一id，雪花算法实现唯一ID
+5. 时间工具类
+6. 数据库的连接与增删改查，暂时只支持mysql数据库
+
 ### log日志
 
 ```python
@@ -77,7 +88,9 @@ bar.finish()
 # 控制台运行结果：
 Progress |  ################################| 100/100  100.00% 0:00:11 
 # log日志输出进度如下：
-[2022-08-26 21:08:38,976][log_name:Progress][INFO][filename:E:\MyJob\PyCharm\PythonTools\yaoysTools\progress\__init__.py][func_name:writeln][131 line]-message:Progress |################################| 100/100  100.00% 0:00:11
+[2022 - 08 - 26 21: 0
+8: 38, 976][log_name: Progress][INFO][filename:E:\MyJob\PyCharm\PythonTools\yaoysTools\progress\__init__.py][
+    func_name: writeln][131 line] - message: Progress |  ################################| 100/100  100.00% 0:00:11
 ```
 
 

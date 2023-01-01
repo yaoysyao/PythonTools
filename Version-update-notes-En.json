@@ -1,4 +1,8 @@
 {
+  "0.0.50": {
+    "1": "update data split",
+    "2": "add demo and update demo code"
+  },
   "0.0.49": {
     "1": "add data split"
   },

@@ -13,7 +13,7 @@ twine upload dist/yaoys-python-tool-0.0.36.tar.gz
 
 setuptools.setup(
     name="yaoys-python-tool",  # pip库名称
-    version="0.0.49",  # 包版本号，便于维护版本
+    version="0.0.50",  # 包版本号，便于维护版本
     author="YaoYuanshuai",  # 作者
     author_email="yys9508@qq.com",  # 联系方式
     description="python工具类",  # 包的简述
@@ -36,7 +36,8 @@ setuptools.setup(
                       'numpy>=1.20.3',
                       'threadpoolctl>=2.0.0',
                       'joblib>=0.11',
-                      'colorlog>=4.0.0'],
+                      'colorlog>=4.0.0',
+                      'pandas>=1.1.0'],
     # data_files=list(str(filepath))
     include_package_data=True,
     exclude_package_date={'': ['.gitignore']}
