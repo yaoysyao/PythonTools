@@ -1,4 +1,7 @@
 {
+  "0.0.51": {
+    "1": "add file_util"
+  },
   "0.0.50": {
     "1": "update data split",
     "2": "add demo and update demo code"

@@ -6,7 +6,7 @@
 import pandas as pd
 
 from yaoysTools.data import SplitFiles
-from yaoysTools.data.datautil import *
+from yaoysTools.data.split_datautil import *
 
 data = pd.read_csv(filepath_or_buffer='../demoFile/data.csv')
 print(len(data))
