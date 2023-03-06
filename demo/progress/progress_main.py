@@ -27,7 +27,7 @@ PROGRESS_TYPE_MOONSPINNER = 'MoonSpinner'
 PROGRESS_TYPE_LINESPINNER = 'LineSpinner' 
 PROGRESS_TYPE_PIXELSPINNER = 'PixelSpinner' 
 '''
-bar = definitionProgress(progress_type=PROGRESS_TYPE_PIXELBAR, count=100, need_show_time=True,
+bar = definitionProgress(progress_type=PROGRESS_TYPE_BAR, count=100, need_show_time=True,
                          show_time_type=PROGRESS_ELAPSED_TD, is_save_log=True, log_path='../log').get_progress()
 for i in range(100):
     # Do some work

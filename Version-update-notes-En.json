@@ -1,4 +1,8 @@
 {
+  "0.0.52": {
+    "1": "remove logUtil get_chain code",
+    "2": "update log color"
+  },
   "0.0.51": {
     "1": "add file_util"
   },

@@ -67,6 +67,7 @@ class Infinite(object):
         self.logger = kwargs.get('logger', None)
         self.check_tty = kwargs.get('check_tty', False)
         self.need_show_time = kwargs.get('need_show_time', True)
+        self.color = kwargs.get('color', None)
         self.show_time_type = kwargs.get('show_time_type', 'elapsed_td')
         if self.logger is not None:
             self.log_level = get_log_level(my_logger=self.logger)

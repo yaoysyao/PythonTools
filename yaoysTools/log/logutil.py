@@ -51,9 +51,9 @@ class mylog(object):
         # 如bg_white,白色背景
         self.__log_colors_config = kwargs.get('log_colors_config', {
             'DEBUG': 'white',  # cyan white
-            'INFO': 'green,fg_bold_green',
-            'WARNING': 'yellow,fg_bold_yellow',
-            'ERROR': 'red,fg_bold_red',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
             'CRITICAL': 'bold_red,fg_bold_bold_red',
         })
 
@@ -221,26 +221,26 @@ class mylog(object):
         return file_path.split('/')[-1]
 
     # 以下方法来源于https://github.com/frankyaorenjie/Python-CLog
-    def get_meta_data(self):
-        frames = inspect.stack()
-        chain_list = []
-        for i in range(0, len(frames)):
-            _, file_path, _, func_name, _, _ = frames[i]
-            file_name = self.__get_file_name_in_full_path(file_path)
-            try:
-                args = re.findall('\((.*)\)', frames[i + 1][-2][0])[0]
-            except IndexError as e:
-                func_result = self.__get_class_from_frame(frames[2][0])
-                if func_result is None:
-                    func_name = ''
-                    args = ''
-                else:
-                    func_name = self.__get_class_from_frame(frames[2][0]).__name__
-                    args = ''
-            current_chain = '%s:%s(%s)' % (file_name, func_name, args)
-            chain_list.append(current_chain)
-        chain_list.reverse()
-        return ' --> '.join(chain_list[-4:-2])
+    # def get_meta_data(self):
+    #     frames = inspect.stack()
+    #     chain_list = []
+    #     for i in range(0, len(frames)):
+    #         _, file_path, _, func_name, _, _ = frames[i]
+    #         file_name = self.__get_file_name_in_full_path(file_path)
+    #         try:
+    #             args = re.findall('\((.*)\)', frames[i + 1][-2][0])[0]
+    #         except IndexError as e:
+    #             func_result = self.__get_class_from_frame(frames[2][0])
+    #             if func_result is None:
+    #                 func_name = ''
+    #                 args = ''
+    #             else:
+    #                 func_name = self.__get_class_from_frame(frames[2][0]).__name__
+    #                 args = ''
+    #         current_chain = '%s:%s(%s)' % (file_name, func_name, args)
+    #         chain_list.append(current_chain)
+    #     chain_list.reverse()
+    #     return ' --> '.join(chain_list[-4:-2])
 
     @staticmethod
     def __get_class_from_frame(fr):
@@ -281,13 +281,13 @@ def getLogger(log_name='self_my_log', log_path=None, log_level=None, file_log_le
     return __myLogger
 
 
-def get_chain():
-    global __self_my_log
-    if __self_my_log is None:
-        return ''
-    else:
-        my_chain = mylog(log_name='self_my_log').get_meta_data()
-        return my_chain
+# def get_chain():
+#     global __self_my_log
+#     if __self_my_log is None:
+#         return ''
+#     else:
+#         my_chain = mylog(log_name='self_my_log').get_meta_data()
+#         return my_chain
 
 
 def _get_file_name():
@@ -323,7 +323,7 @@ def log_info(message, my_logger=None):
 
     if my_logger.level != MY_LOG_INFO:
         my_logger.setLevel(MY_LOG_INFO)
-    my_logger.info(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
+    my_logger.info(message, extra={'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # 暂时取消以下代码，因为如果不取消在demo中调用a方法，只能输出a中的日志，其他的方法中不输出，原因是因为，每次调用的时候handler被清空了，导致控制台handler没有了
     # my_logger.handlers = []
 
@@ -336,7 +336,7 @@ def log_error(message, my_logger=None):
 
     if my_logger.level != MY_LOG_ERROR:
         my_logger.setLevel(MY_LOG_ERROR)
-    my_logger.error(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
+    my_logger.error(message, extra={'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
 
 
@@ -348,7 +348,7 @@ def log_warn(message, my_logger=None):
 
     if my_logger.level != MY_LOG_WARN:
         my_logger.setLevel(MY_LOG_WARN)
-    my_logger.warning(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
+    my_logger.warning(message, extra={'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
 
 
@@ -359,7 +359,8 @@ def log_debug(message, my_logger=None):
         my_logger = get_log(log_level=MY_LOG_DEBUG).get_logger()
     if my_logger.level != MY_LOG_DEBUG:
         my_logger.setLevel(MY_LOG_DEBUG)
-    my_logger.debug(message, extra={'chain': get_chain(), 'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
+    # '''chain': get_chain(),'''
+    my_logger.debug(message, extra={'log_filename': _get_file_name(), 'func_name': _get_code_function_name(), 'line_number': _get_code_line_number()})
     # my_logger.handlers = []
 
 
