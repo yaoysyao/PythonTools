@@ -171,18 +171,18 @@ class mylog(object):
         #     如果不需要生成全部日志文件，但是需要按照日期分割,此时只需要生成设置的日志级别的日志文件即可
         elif self.__is_all_file is False and self.__is_split_log is True:
             if self.__log_level == MY_LOG_INFO:
-                self.__info_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '_' + str(logging.getLevelName(MY_LOG_INFO)).lower() + '.log')
+                self.__info_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '.log')
             elif self.__log_level == MY_LOG_ERROR:
-                self.__error_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '_' + str(logging.getLevelName(MY_LOG_ERROR)).lower() + '.log')
+                self.__error_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '.log')
             elif self.__log_level == MY_LOG_DEBUG:
-                self.__debug_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '_' + str(logging.getLevelName(MY_LOG_DEBUG)).lower() + '.log')
+                self.__debug_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '.log')
             elif self.__log_level == MY_LOG_WARN:
-                self.__warn_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '_' + str(logging.getLevelName(MY_LOG_WARN)).lower() + '.log')
+                self.__warn_log_name = os.path.join(path_dir, self.__log_day + '_' + self.__log_file_name + '.log')
             else:
                 raise Exception('Thr log level is not in [info,warn,error,debug]')
         # 如果既不需要生成所有的日志文件，也不需要按照日期分割，那么则只需要按照当前日志级别生成一个名称不带日期的日志文件
         elif self.__is_all_file is False and self.__is_split_log is False:
-            self.__one_log_name = os.path.join(path_dir, self.__log_file_name + '_' + str(logging.getLevelName(self.__log_level)).lower() + '.log')
+            self.__one_log_name = os.path.join(path_dir, self.__log_file_name + '.log')
         else:
             raise Exception('The is_all_file or is_split_log args error!')
 
