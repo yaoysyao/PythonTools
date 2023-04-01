@@ -1,4 +1,7 @@
 {
+  "0.0.53": {
+    "1": "Added log log properties to set whether logs need to be split by date and whether all log files need to be generated"
+  },
   "0.0.52": {
     "1": "remove logUtil get_chain code",
     "2": "update log color"
