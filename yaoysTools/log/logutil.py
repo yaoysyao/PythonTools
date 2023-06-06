@@ -14,6 +14,36 @@ MY_LOG_WARN = logging.WARNING
 MY_LOG_ALL = logging.DEBUG
 
 
+# 解决日志重复输出的问题，参考自：https://github.com/ydf0509/nb_log
+def my_addHandler(self, hdlr):
+    """
+    Add the specified handler to this logger.
+    """
+    logging._acquireLock()  # noqa
+
+    try:
+        """ 官方代码
+        if not (hdlr in self.handlers):
+            self.handlers.append(hdlr)
+        """
+        # 解决的原理就是，每次需要新增时，判断原有的handler中是否存在相同的日志级别的handler，如果存在相同的，则加入到set中，此时不加入handlers
+        hdlrx_set = set()
+        for hdlrx in self.handlers:
+            hdlrx_type = type(hdlrx)
+            if hdlrx.level == hdlr.level:
+                hdlrx_set.add(hdlrx_type)
+
+        hdlr_type = type(hdlr)
+        if hdlr_type not in hdlrx_set:
+            self.handlers.append(hdlr)
+    finally:
+        logging._releaseLock()
+
+
+# 重写logging模块的addHandler方法，实现同一个logger不重复添加相同的handler，解决重复打印和重复写入文件的问题
+logging.Logger.addHandler = my_addHandler
+
+
 class mylog(object):
 
     def __init__(self, **kwargs):
@@ -30,6 +60,7 @@ class mylog(object):
                is_split_log:是否按照日期分割日志文件，默认为False，如果设置为True，则会按照每天的日期产生文件夹和日志文件
                is_all_file:生成日志文件时是否产生全部日志文件，默认为False，此时只产生一个日志文件，设置为True，则会产生不同级别的日志文件
                log_file_name:日志文件名称，默认为log
+               is_color_console:控制台输出是否区分颜色，默认为FALSE
         """
 
         self.__log_level = kwargs.get('log_level', MY_LOG_INFO)
@@ -40,35 +71,19 @@ class mylog(object):
         self.__is_split_log = kwargs.get('is_split_log', False)
         self.__is_all_file = kwargs.get('is_all_file', False)
         self.__log_file_name = kwargs.get('log_file_name', 'log')
+        self.__is_color_console = kwargs.get('is_color_console', False)
         # 设置日志路径
         self.__log_path = kwargs.get('log_path', None)
 
         # 只需要保存到文件，不需要在控制台输出,默认是FALSE
         self.is_only_file = kwargs.get('is_only_file', False)
 
-        # 不同级别的日志颜色
-        # 以下转义码可用于格式字符串：
-        #
-        # {color}, fg_{color}, bg_{color}: 前景色和背景色。
-        # bold, bold_{color}, fg_bold_{color}, bg_bold_{color}: 粗体/明亮的颜色。
-        # thin, thin_{color}, fg_thin_{color}: 淡色（取决于终端）。
-        # reset：清除所有格式（前景色和背景色）。
-        # 可用的颜色名称为black、red、green、yellow、blue、 purple和。cyanwhite
-        # 如bg_white,白色背景
-        self.__log_colors_config = kwargs.get('log_colors_config', {
-            'DEBUG': 'white',  # cyan white
-            'INFO': 'green',
-            'WARNING': 'yellow',
-            'ERROR': 'red',
-            'CRITICAL': 'bold_red,fg_bold_bold_red',
-        })
-
         if self.__save_log2_file is True or self.is_only_file is True:
             if self.__log_path is None:
                 raise Exception('The save_log2_file or is_only_file is true,you must set a log path')
 
         # 日志一共分成5个等级，从高到低分别是：CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
-        # 保存日志时,会按照日志等级，保存该级别日志以及以下日志
+        # 保存日志时,会按照日志等级，保存该级别日志以及以上日志
         if self.__log_level is None:
             self.__log_level = MY_LOG_DEBUG
         if self.__file_log_level is None:
@@ -105,7 +120,23 @@ class mylog(object):
 
         self.__formatter = logging.Formatter(self.__format_str)
         # 控制台日志输出格式，按照不同的颜色
-        self.__console_formatter = colorlog.ColoredFormatter(
+        # 不同级别的日志颜色
+        # 以下转义码可用于格式字符串：
+        #
+        # {color}, fg_{color}, bg_{color}: 前景色和背景色。
+        # bold, bold_{color}, fg_bold_{color}, bg_bold_{color}: 粗体/明亮的颜色。
+        # thin, thin_{color}, fg_thin_{color}: 淡色（取决于终端）。
+        # reset：清除所有格式（前景色和背景色）。
+        # 可用的颜色名称为black、red、green、yellow、blue、 purple和。cyanwhite
+        # 如bg_white,白色背景
+        self.__log_colors_config = kwargs.get('log_colors_config', {
+            'DEBUG': 'white',  # cyan white
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'bold_red,fg_bold_bold_red',
+        })
+        self.__console_color_formatter = colorlog.ColoredFormatter(
             # 格式
             fmt='%(log_color)s' + self.__format_str,
             # datefmt='%Y-%m-%d  %H:%M:%S',
@@ -122,7 +153,10 @@ class mylog(object):
         self.__stream_handler = logging.StreamHandler()
         self.__stream_handler.setLevel(self.__stream_log_level)
         # 控制台日志格式
-        self.__stream_handler.setFormatter(self.__console_formatter)
+        if self.__is_color_console is True:
+            self.__stream_handler.setFormatter(self.__console_color_formatter)
+        else:
+            self.__stream_handler.setFormatter(self.__formatter)
         # 控制台handler
         if not (self.__stream_handler in self.__logger.handlers):
             self.__logger.addHandler(self.__stream_handler)
@@ -189,34 +223,34 @@ class mylog(object):
     def __set_file_handler(self):
         # CRITICAL = FATAL > ERROR > WARNING =  WARN > INFO > DEBUG > NOTSET = 0
         # 创建一个通用的handler，用于写入日志文件，写入所有的日志级别
-        if self.__all_log_name is not None:
-            self.__all_file_handler = logging.FileHandler(self.__all_log_name, encoding='utf-8')
-            self.__all_file_handler.setLevel(self.__file_log_level)
-        # 创建一个info_handler，用于写入INFO日志文件，只写入info级别及以下的日志
+        # if self.__all_log_name is not None:
+        #     self.__all_file_handler = logging.FileHandler(self.__all_log_name, encoding='utf-8')
+        #     self.__all_file_handler.setLevel(self.__file_log_level)
+        # 创建一个info_handler，用于写入INFO日志文件，只写入info级别以上的日志
         if self.__info_log_name is not None:
             self.__info_file_handler = logging.FileHandler(self.__info_log_name, encoding='utf-8')
             self.__info_file_handler.setLevel(MY_LOG_INFO)
-        # 创建一个error_handler，用于写入ERROR日志文件，只写入error级别及以下的日志
+        # 创建一个error_handler，用于写入ERROR日志文件，只写入error级别以上的日志
         if self.__error_log_name is not None:
             self.__error_file_handler = logging.FileHandler(self.__error_log_name, encoding='utf-8')
             self.__error_file_handler.setLevel(MY_LOG_ERROR)
-        # 创建一个debug_handler，用于写入DEBUG日志文件，写入debug级别及以下的日志
+        # 创建一个debug_handler，用于写入DEBUG日志文件，写入debug级别以上的日志
         if self.__debug_log_name is not None:
             self.__debug_file_handler = logging.FileHandler(self.__debug_log_name, encoding='utf-8')
             self.__debug_file_handler.setLevel(MY_LOG_DEBUG)
-        # 创建一个warn_handler，用于写入WARNING日志文件，写入WARNING级别及以下的日志
+        # 创建一个warn_handler，用于写入WARNING日志文件，写入WARNING级别以上的日志
         if self.__warn_log_name is not None:
             self.__warn_file_handler = logging.FileHandler(self.__warn_log_name, encoding='utf-8')
             self.__warn_file_handler.setLevel(MY_LOG_WARN)
         #     创建一个one_handler，用于写入log_level日志文件
         if self.__one_log_name is not None:
             self.__one_file_handler = logging.FileHandler(self.__one_log_name, encoding='utf-8')
-            self.__one_file_handler.setLevel(self.__log_level)
+            self.__one_file_handler.setLevel(self.__file_log_level)
 
     def __set_file_formatter(self):
         # 日志文件日志格式
-        if self.__all_file_handler is not None:
-            self.__all_file_handler.setFormatter(self.__formatter)
+        # if self.__all_file_handler is not None:
+        #     self.__all_file_handler.setFormatter(self.__formatter)
         # 日志文件日志格式
         if self.__info_file_handler is not None:
             self.__info_file_handler.setFormatter(self.__formatter)
@@ -237,23 +271,24 @@ class mylog(object):
         # if not self.__logger.handlers:
         # 给logger添加handler
         # 如果保存到文件
-        if not (self.__all_file_handler in self.__logger.handlers) and self.__all_file_handler is not None:
-            # 所有日志级别handler，如果不配置，则无法写入文件
-            self.__logger.addHandler(self.__all_file_handler)
+        # if not (self.__all_file_handler in self.__logger.handlers) and self.__all_file_handler is not None:
+        #     # 所有日志级别handler，如果不配置，则无法写入文件
+        #     self.__logger.addHandler(self.__all_file_handler)
 
-        if not (self.__info_file_handler in self.__logger.handlers) and self.__info_file_handler is not None:
+        # 如果handler不是None,并且不在handlers中，并且设置的文本日志级别小于或者等于info级别，此时将设置info，日志文件中写入大于等于info级别的日志
+        if not (self.__info_file_handler in self.__logger.handlers) and self.__info_file_handler is not None and self.__file_log_level <= MY_LOG_INFO:
             # info日志级别handler，如果不配置，则无法写入文件
             self.__logger.addHandler(self.__info_file_handler)
 
-        if not (self.__error_file_handler in self.__logger.handlers) and self.__error_file_handler is not None:
+        if not (self.__error_file_handler in self.__logger.handlers) and self.__error_file_handler is not None and self.__file_log_level <= MY_LOG_ERROR:
             # error日志级别handler，如果不配置，则无法写入文件
             self.__logger.addHandler(self.__error_file_handler)
 
-        if not (self.__debug_file_handler in self.__logger.handlers) and self.__debug_file_handler is not None:
+        if not (self.__debug_file_handler in self.__logger.handlers) and self.__debug_file_handler is not None and self.__file_log_level <= MY_LOG_DEBUG:
             # debug日志级别handler，如果不配置，则无法写入文件
             self.__logger.addHandler(self.__debug_file_handler)
 
-        if not (self.__warn_file_handler in self.__logger.handlers) and self.__warn_file_handler is not None:
+        if not (self.__warn_file_handler in self.__logger.handlers) and self.__warn_file_handler is not None and self.__file_log_level <= MY_LOG_WARN:
             # warning日志级别handler，如果不配置，则无法写入文件
             self.__logger.addHandler(self.__warn_file_handler)
 
@@ -325,7 +360,8 @@ def get_log(log_name='self_my_log',
             is_only_file=False,
             is_split_log=False,
             is_all_file=False,
-            log_file_name='log'):
+            log_file_name='log',
+            is_color_console=False):
     global __self_my_log
     __self_my_log = mylog(log_name=log_name,
                           log_path=log_path,
@@ -336,7 +372,8 @@ def get_log(log_name='self_my_log',
                           is_only_file=is_only_file,
                           is_split_log=is_split_log,
                           is_all_file=is_all_file,
-                          log_file_name=log_file_name)
+                          log_file_name=log_file_name,
+                          is_color_console=is_color_console)
     return __self_my_log
 
 
@@ -349,7 +386,8 @@ def getLogger(log_name='self_my_log',
               is_only_file=False,
               is_split_log=False,
               is_all_file=False,
-              log_file_name='log'):
+              log_file_name='log',
+              is_color_console=False):
     global __self_my_log
     __self_my_log = get_log(log_name=log_name,
                             log_path=log_path,
@@ -360,7 +398,8 @@ def getLogger(log_name='self_my_log',
                             is_only_file=is_only_file,
                             is_split_log=is_split_log,
                             is_all_file=is_all_file,
-                            log_file_name=log_file_name)
+                            log_file_name=log_file_name,
+                            is_color_console=is_color_console)
     if __self_my_log is None:
         raise Exception('The global self_my_log is none,please set self_my_log')
 

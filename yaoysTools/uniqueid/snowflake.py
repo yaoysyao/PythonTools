@@ -1,12 +1,10 @@
 '''
 Python 版本snowflake 雪花算法
-Python version：3.6
+Python version：3.7
 来源于:https://blog.csdn.net/yanxilou/article/details/119645290
 '''
 
 import time
-
-import yaoysTools.log.logutil as logutil
 
 # 64位ID的划分
 WORKER_ID_BITS = 5
@@ -26,7 +24,8 @@ SEQUENCE_MASK = -1 ^ (-1 << SEQUENCE_BITS)
 # Twitter元年时间戳
 TWEPOCH = 1288834974657
 
-logger = logutil.getLogger(log_name='[snowflake]', log_level=logutil.MY_LOG_INFO)
+
+# logger = logutil.getLogger(log_name='[snowflake]', log_level=logutil.MY_LOG_INFO)
 
 
 class snowFlakeId(object):

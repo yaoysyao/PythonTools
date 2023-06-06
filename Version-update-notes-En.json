@@ -1,4 +1,8 @@
 {
+  "0.0.54": {
+    "1": "A new log property has been added to set whether to output to the console in different colors",
+    "2": "Solve the problem of duplicate output of log logs"
+  },
   "0.0.53": {
     "1": "Added log log properties to set whether logs need to be split by date and whether all log files need to be generated"
   },
