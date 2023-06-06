@@ -384,9 +384,9 @@ def getLogger(log_name='self_my_log',
 def _get_file_name():
     # 获取调用该方法的文件的名称。0指的是当前文件，1表示上一个文件，以栈的方式保存调用链路
     file_name = sys._getframe(2).f_code.co_filename
-    if file_name != '' and file_name.count('/') >= 3:
+    if file_name != '' and file_name.count('/') >= 1:
         return '/'.join(str(i) for i in file_name.split('/')[-1:])
-    elif file_name != '' and file_name.count('\\') >= 3:
+    elif file_name != '' and file_name.count('\\') >= 1:
         return '\\'.join(str(i) for i in file_name.split('\\')[-1:])
     else:
         return file_name
